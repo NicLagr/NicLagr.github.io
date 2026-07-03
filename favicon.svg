@@ -5,21 +5,19 @@
       <stop offset="100%" stop-color="#141436"/>
     </linearGradient>
   </defs>
-  <!-- app-tile container -->
-  <rect x="6" y="6" width="88" height="88" rx="24" fill="url(#bg)" stroke="rgba(255,255,255,0.5)" stroke-width="2"/>
-  <!-- isometric glass cube -->
+  <!-- app-tile container (near-full-bleed so the mark stays large in a 16px tab) -->
+  <rect x="3" y="3" width="94" height="94" rx="22" fill="url(#bg)"/>
+  <!-- bold isometric glass cube, no lettering (illegible at favicon size) -->
   <!-- top face (brightest) -->
-  <polygon points="50,24 76,39 50,54 24,39" fill="#c8dcff" opacity="0.92"/>
-  <!-- left face (front, carries N) -->
-  <polygon points="24,39 50,54 50,82 24,67" fill="#7aa2ff" opacity="0.82"/>
+  <polygon points="50,14 86,35 50,56 14,35" fill="#cfe0ff"/>
+  <!-- left face (accent) -->
+  <polygon points="14,35 50,56 50,86 14,65" fill="#7aa2ff"/>
   <!-- right face (shadow) -->
-  <polygon points="76,39 50,54 50,82 76,67" fill="#4a5bb0" opacity="0.7"/>
-  <!-- edges -->
-  <g stroke="rgba(255,255,255,0.7)" stroke-width="1.5" fill="none" stroke-linejoin="round">
-    <polygon points="50,24 76,39 50,54 24,39"/>
-    <polygon points="24,39 50,54 50,82 24,67"/>
-    <polygon points="76,39 50,54 50,82 76,67"/>
+  <polygon points="86,35 50,56 50,86 86,65" fill="#3f4f9c"/>
+  <!-- crisp edges -->
+  <g stroke="#ffffff" stroke-width="2.4" fill="none" stroke-linejoin="round" opacity="0.85">
+    <polygon points="50,14 86,35 50,56 14,35"/>
+    <polygon points="14,35 50,56 50,86 14,65"/>
+    <polygon points="86,35 50,56 50,86 86,65"/>
   </g>
-  <!-- N on the front-left face -->
-  <text x="37" y="68" font-family="'Clash Display','Helvetica Neue',sans-serif" font-size="20" font-weight="700" fill="#ffffff" text-anchor="middle" transform="skewY(11.3) translate(0,-4)">N</text>
 </svg>
