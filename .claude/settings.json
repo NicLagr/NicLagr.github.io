@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c \"import fitz; d=fitz.open\\('public/Resume_Final_Reviewed.pdf'\\); print\\('is_repaired:', d.is_repaired, '| pages:', d.page_count\\)\")",
+      "Bash(python3 -c ' *)",
+      "Bash(cd /Users/nicolo.lagravinese/NicLagr.github.io *)",
+      "Read(//Users/nicolo.lagravinese/Downloads/**)",
+      "Bash(cp ~/Downloads/Resume_Final_Reviewed.pdf public/Resume_Final_Reviewed.pdf)",
+      "Bash(yarn deploy *)",
+      "Bash(curl -s -o /dev/null -w \"  https://niclagr.github.io/  -> %{http_code}\\\\n\" https://niclagr.github.io/)",
+      "Bash(curl -s -o /dev/null -w \"  /Resume_Final_Reviewed.pdf  -> %{http_code}\\\\n\" https://niclagr.github.io/Resume_Final_Reviewed.pdf)"
+    ],
+    "additionalDirectories": [
+      "/Users/nicolo.lagravinese/NicLagr.github.io"
+    ]
+  }
+}

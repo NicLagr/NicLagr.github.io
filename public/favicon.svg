@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2a2566"/>
+      <stop offset="100%" stop-color="#141436"/>
+    </linearGradient>
+  </defs>
+  <!-- app-tile container (near-full-bleed so the mark stays large in a 16px tab) -->
+  <rect x="3" y="3" width="94" height="94" rx="22" fill="url(#bg)"/>
+  <!-- bold isometric glass cube, no lettering (illegible at favicon size) -->
+  <!-- top face (brightest) -->
+  <polygon points="50,14 86,35 50,56 14,35" fill="#cfe0ff"/>
+  <!-- left face (accent) -->
+  <polygon points="14,35 50,56 50,86 14,65" fill="#7aa2ff"/>
+  <!-- right face (shadow) -->
+  <polygon points="86,35 50,56 50,86 86,65" fill="#3f4f9c"/>
+  <!-- crisp edges -->
+  <g stroke="#ffffff" stroke-width="2.4" fill="none" stroke-linejoin="round" opacity="0.85">
+    <polygon points="50,14 86,35 50,56 14,35"/>
+    <polygon points="14,35 50,56 50,86 14,65"/>
+    <polygon points="86,35 50,56 50,86 86,65"/>
+  </g>
+</svg>

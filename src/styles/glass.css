@@ -1,0 +1,540 @@
+/* ============================================================
+   Liquid Glass Console OS — design system
+   PS3 XMB deep-indigo palette · iOS-26 frosted glass · Wii tiles
+   ============================================================ */
+
+@import url('https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&f[]=general-sans@400,500,600,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
+/* Fonts for the opt-in cube Themes: VT323 (Retro CRT), Orbitron (Chrome/Hologram/Neon) */
+@import url('https://fonts.googleapis.com/css2?family=VT323&family=Orbitron:wght@400;500;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* ---- XMB deep-indigo backdrop ---- */
+  --xmb-0: #070b1c;   /* near-black navy (bottom)     */
+  --xmb-1: #0f1638;   /* deep navy-indigo             */
+  --xmb-2: #16204c;   /* indigo-blue                  */
+  --xmb-3: #1b2a5e;   /* blue-indigo (top) — less violet */
+  --xmb-glow: #5f86ff;
+
+  /* ---- Glass surfaces ---- */
+  --glass-fill: rgba(255, 255, 255, 0.07);
+  --glass-fill-strong: rgba(255, 255, 255, 0.11);
+  --glass-edge: rgba(255, 255, 255, 0.22);
+  --glass-edge-soft: rgba(255, 255, 255, 0.12);
+  --glass-spec: rgba(255, 255, 255, 0.55);  /* top specular highlight */
+
+  /* ---- Text ---- */
+  --ink: #f4f6ff;
+  --ink-dim: rgba(238, 242, 255, 0.78);
+  --ink-faint: rgba(238, 242, 255, 0.54);
+
+  /* ---- Accents (cool, calm — glass-cube blue→green) ---- */
+  --accent: #7aa2ff;
+  --accent-2: #5ee7c6;
+  --accent-3: #8fb4ff;
+  --accent-grad: linear-gradient(120deg, #7aa2ff 0%, #5ee7c6 100%);
+
+  --radius: 22px;
+  --radius-sm: 14px;
+  --radius-lg: 30px;
+
+  /* backdrop tint (rgb) — the cube skin nudges this; default deep indigo */
+  --bg-tint: 40, 72, 150;
+}
+
+/* ---- Base reset (override any retro globals if present) ---- */
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: 'General Sans', system-ui, -apple-system, 'Segoe UI', sans-serif !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+  font-smooth: always !important;
+  color: var(--ink);
+  background: #04050b;
+  letter-spacing: -0.005em;
+  text-rendering: optimizeLegibility;
+  text-wrap: pretty;
+}
+
+/* Clash Display for headings + the display class */
+h1, h2, h3, h4, .gx-display {
+  font-family: 'Clash Display', 'General Sans', system-ui, sans-serif;
+  font-weight: 600;
+  text-wrap: balance;
+}
+
+/* JetBrains Mono = "system software" texture: labels, clock, tags, indices */
+.gx-mono {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-feature-settings: 'tnum' 1;
+}
+
+/* ============================================================
+   CUBE THEMES (opt-in via the cube's Theme dial) — whole-page font swaps
+   + background treatments. Orthogonal to skin/sound/motion. Keyed off the
+   data-cube-theme attribute set by cubeSettings.applyPageTheme().
+   ============================================================ */
+
+/* --- whole-page fonts --- */
+html[data-cube-theme='retro'] :is(body, h1, h2, h3, h4, .gx-display, .gx-mono, .gx-label, .gx-chip, .gx-btn) {
+  font-family: 'VT323', 'JetBrains Mono', ui-monospace, monospace !important;
+  letter-spacing: 0.01em;
+}
+html[data-cube-theme='retro'] body { font-size: 1.12em; -webkit-font-smoothing: auto !important; }
+html[data-cube-theme='retro'] .gx-display { font-weight: 400; letter-spacing: 0.005em; }
+
+html[data-cube-theme='terminal'] :is(body, h1, h2, h3, h4, .gx-display, .gx-mono, .gx-label, .gx-chip, .gx-btn),
+html[data-cube-theme='blueprint'] :is(body, h1, h2, h3, h4, .gx-display, .gx-mono, .gx-label, .gx-chip, .gx-btn) {
+  font-family: 'JetBrains Mono', ui-monospace, monospace !important;
+}
+html[data-cube-theme='terminal'] .gx-display,
+html[data-cube-theme='blueprint'] .gx-display { font-weight: 500; letter-spacing: -0.01em; }
+html[data-cube-theme='blueprint'] :is(h1, h2, .gx-display) { text-transform: uppercase; letter-spacing: 0.04em; }
+
+html[data-cube-theme='chrome'] :is(body, h1, h2, h3, h4, .gx-display, .gx-mono, .gx-label, .gx-chip, .gx-btn),
+html[data-cube-theme='hologram'] :is(body, h1, h2, h3, h4, .gx-display, .gx-mono, .gx-label, .gx-chip, .gx-btn),
+html[data-cube-theme='neon'] :is(body, h1, h2, h3, h4, .gx-display, .gx-mono, .gx-label, .gx-chip, .gx-btn) {
+  font-family: 'Orbitron', 'General Sans', sans-serif !important;
+  letter-spacing: 0.005em;
+}
+html[data-cube-theme='chrome'] body,
+html[data-cube-theme='hologram'] body,
+html[data-cube-theme='neon'] body { font-size: 0.94em; }
+html[data-cube-theme='chrome'] .gx-display,
+html[data-cube-theme='hologram'] .gx-display,
+html[data-cube-theme='neon'] .gx-display { font-weight: 700; }
+
+/* --- background treatments (layer over the skin tint, behind page content) --- */
+.gx-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 600ms ease;
+}
+html[data-cube-theme='retro'] .gx-bg::after {
+  opacity: 1;
+  background: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 3px);
+}
+html[data-cube-theme='terminal'] .gx-bg::after {
+  opacity: 1;
+  background:
+    radial-gradient(80% 60% at 50% 40%, rgba(10, 255, 157, 0.10) 0%, transparent 60%),
+    repeating-linear-gradient(0deg, rgba(10, 255, 157, 0.06) 0 1px, transparent 1px 3px);
+}
+html[data-cube-theme='blueprint'] .gx-bg::after {
+  opacity: 1;
+  background:
+    linear-gradient(rgba(122, 184, 255, 0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(122, 184, 255, 0.09) 1px, transparent 1px);
+  background-size: 42px 42px;
+}
+html[data-cube-theme='chrome'] .gx-bg::after {
+  opacity: 1;
+  background: linear-gradient(120deg, transparent 38%, rgba(255, 255, 255, 0.05) 50%, transparent 62%);
+}
+html[data-cube-theme='hologram'] .gx-bg::after {
+  opacity: 1;
+  background:
+    radial-gradient(80% 60% at 50% 45%, rgba(38, 224, 255, 0.10) 0%, transparent 60%),
+    repeating-linear-gradient(0deg, rgba(38, 224, 255, 0.055) 0 2px, transparent 2px 5px);
+}
+html[data-cube-theme='neon'] .gx-bg::after {
+  opacity: 1;
+  background:
+    radial-gradient(70% 55% at 50% 42%, rgba(255, 61, 240, 0.10) 0%, transparent 62%),
+    linear-gradient(rgba(255, 61, 240, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(41, 231, 255, 0.06) 1px, transparent 1px);
+  background-size: 100% 100%, 46px 46px, 46px 46px;
+}
+
+/* small label — sentence case, sans (not all-caps mono) */
+.gx-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--ink-faint);
+}
+
+/* keep the cursor default (kill any retro custom cursors) */
+* { cursor: auto; }
+a, button, [role="button"], .gx-tappable { cursor: pointer; }
+
+::selection {
+  background: rgba(122, 162, 255, 0.35);
+  color: #fff;
+}
+
+/* ============================================================
+   XMB background
+   ============================================================ */
+.gx-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  /* GameCube-style blackout with a faint indigo lift behind the centre so the
+     glass still has something to sit against; keeps the XMB wave readable. */
+  background:
+    radial-gradient(90% 65% at 50% 42%, rgba(var(--bg-tint), 0.22) 0%, transparent 62%),
+    radial-gradient(120% 80% at 85% 6%, rgba(var(--bg-tint), 0.16) 0%, transparent 55%),
+    linear-gradient(180deg, #05060e 0%, #04050b 55%, #020207 100%);
+  transition: background 600ms ease;
+}
+
+/* the signature flowing XMB wave ribbon */
+.gx-wave {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gx-wave * { animation: none !important; }
+}
+
+/* ============================================================
+   Glass surfaces
+   ============================================================ */
+.gx-glass {
+  position: relative;
+  background: var(--glass-fill);
+  border: 1px solid var(--glass-edge-soft);
+  border-radius: var(--radius);
+  backdrop-filter: blur(22px) saturate(150%);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+  box-shadow:
+    0 18px 50px -12px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 0 var(--glass-spec),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+}
+
+.gx-glass-strong {
+  background: var(--glass-fill-strong);
+  border: 1px solid var(--glass-edge);
+  border-radius: var(--radius);
+  backdrop-filter: blur(30px) saturate(160%);
+  -webkit-backdrop-filter: blur(30px) saturate(160%);
+  box-shadow:
+    0 24px 70px -16px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 0 var(--glass-spec),
+    inset 0 -1px 0 0 rgba(255, 255, 255, 0.04);
+}
+
+/* specular top-edge sheen used on tiles/panels */
+.gx-sheen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0) 42%);
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+/* Wii-style channel tile */
+.gx-tile {
+  position: relative;
+  border-radius: var(--radius);
+  background: var(--glass-fill);
+  border: 1px solid var(--glass-edge-soft);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  box-shadow:
+    0 14px 40px -14px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 0 var(--glass-spec);
+  overflow: hidden;
+  transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.25, 1),
+              box-shadow 0.35s ease, border-color 0.35s ease;
+}
+.gx-tile:hover {
+  border-color: var(--glass-edge);
+  box-shadow:
+    0 30px 64px -18px rgba(0, 0, 0, 0.66),
+    inset 0 1px 0 0 var(--glass-spec);
+}
+
+/* glossy "pill" button */
+.gx-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.4rem;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--ink);
+  background: var(--glass-fill-strong);
+  border: 1px solid var(--glass-edge);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  box-shadow: inset 0 1px 0 0 var(--glass-spec), 0 8px 24px -8px rgba(0,0,0,0.5);
+  transition: transform 0.25s cubic-bezier(0.2,0.9,0.25,1), box-shadow 0.25s, background 0.25s;
+}
+.gx-btn:hover {
+  transform: translateY(-1px);
+  background: rgba(255,255,255,0.16);
+  box-shadow: inset 0 1px 0 0 var(--glass-spec), 0 14px 32px -10px rgba(0,0,0,0.6);
+}
+.gx-btn:active { transform: translateY(0) scale(0.98); }
+
+.gx-btn-primary {
+  background: var(--accent-grad);
+  color: #0a0a1f;
+  border: 1px solid rgba(255,255,255,0.5);
+  text-shadow: none;
+}
+.gx-btn-primary:hover {
+  background: var(--accent-grad);
+  filter: brightness(1.05);
+  box-shadow: inset 0 1px 0 0 rgba(255,255,255,0.7), 0 14px 32px -10px rgba(0,0,0,0.5);
+}
+
+/* small frosted "system tag" chip */
+.gx-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.7rem;
+  border-radius: 8px;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--ink-dim);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-edge-soft);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* XMB-style channel row */
+.gx-channel {
+  position: relative;
+  transition: padding-left 0.3s cubic-bezier(0.2, 0.9, 0.25, 1), background 0.3s ease;
+  border-radius: 12px;
+}
+.gx-channel::before {
+  content: "";
+  position: absolute;
+  left: -4px; top: 18%; bottom: 18%;
+  width: 3px; border-radius: 3px;
+  background: var(--accent-grad);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.gx-channel:hover {
+  background: rgba(255, 255, 255, 0.04);
+  padding-left: 1.1rem;
+}
+.gx-channel:hover::before { opacity: 1; }
+
+/* status dot (static — no attention-grabbing pulse) */
+.gx-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--accent-2);
+}
+
+/* ============================================================
+   Cursor-reactive glass — light tracking + subtle tilt
+   ============================================================ */
+.gx-reactive {
+  transform: perspective(1000px)
+    rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(var(--lift, 0px));
+  transform-style: preserve-3d;
+  transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.25, 1),
+    box-shadow 0.35s ease, border-color 0.35s ease;
+  will-change: transform;
+}
+/* moving specular highlight that follows the pointer */
+.gx-reactive::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+    340px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(255, 255, 255, 0.16),
+    rgba(255, 255, 255, 0) 46%
+  );
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  z-index: 2;
+}
+.gx-reactive[data-active="1"]::after { opacity: 1; }
+
+/* console-style focus selection (keyboard / D-pad navigation) */
+.gx-selectable:focus-visible,
+.gx-selectable[data-selected="1"] {
+  outline: none;
+  border-color: rgba(122, 162, 255, 0.7);
+  box-shadow:
+    0 0 0 2px rgba(122, 162, 255, 0.55),
+    0 0 26px -2px rgba(122, 162, 255, 0.5),
+    inset 0 1px 0 0 var(--glass-spec);
+}
+
+/* one-time navigation hint chip */
+.gx-hint {
+  position: fixed;
+  left: 50%;
+  bottom: 22px;
+  transform: translateX(-50%);
+  z-index: 900;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gx-reactive { transform: none !important; transition: none !important; }
+}
+@media (hover: none) {
+  /* touch devices: no tilt, no parallax jitter */
+  .gx-reactive { transform: none !important; }
+}
+
+/* gradient text */
+.gx-grad-text {
+  background: var(--accent-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* scrollbar */
+.gx-scroll::-webkit-scrollbar { width: 10px; height: 10px; }
+.gx-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.18);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+.gx-scroll::-webkit-scrollbar-track { background: transparent; }
+
+/* hide scrollbar utility */
+.gx-noscroll::-webkit-scrollbar { display: none; }
+.gx-noscroll { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* section reveal helper */
+.gx-anchor { scroll-margin-top: 92px; }
+
+html { scroll-behavior: smooth; }
+
+/* ============================================================
+   Aurora accent system — the hero cube's palette, reused as soft
+   green/blue/violet blooms behind headers and as the hover sheen
+   on the dark-glass rows. Ties the whole page back to the cube.
+   ============================================================ */
+.gx-aurora {
+  background:
+    radial-gradient(58% 58% at 24% 26%, rgba(46, 214, 140, 0.60), transparent 70%),
+    radial-gradient(52% 52% at 74% 30%, rgba(150, 70, 240, 0.55), transparent 70%),
+    radial-gradient(58% 58% at 62% 70%, rgba(236, 58, 150, 0.38), transparent 72%),
+    radial-gradient(54% 54% at 40% 66%, rgba(32, 110, 240, 0.55), transparent 72%),
+    radial-gradient(48% 48% at 52% 94%, rgba(110, 54, 220, 0.5), transparent 72%);
+}
+
+/* animated header bloom (playful: slow drift, guards reduced-motion) */
+.gx-head-glow {
+  position: absolute;
+  left: -24px;
+  top: 50%;
+  width: 220px;
+  height: 150px;
+  transform: translateY(-50%);
+  filter: blur(42px);
+  opacity: 0.55;
+  pointer-events: none;
+  z-index: 0;
+  animation: gx-drift 13s ease-in-out infinite;
+}
+@keyframes gx-drift {
+  0%, 100% { transform: translateY(-50%) translateX(0) scale(1); }
+  50% { transform: translateY(-54%) translateX(22px) scale(1.08); }
+}
+
+/* ------------------------------------------------------------
+   Minimal dark-glass row (Work / Play)
+   ------------------------------------------------------------ */
+.gx-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  width: 100%;
+  padding: 1.35rem 1.6rem;
+  border-radius: 18px;
+  text-align: left;
+  background: rgba(255, 255, 255, 0.028);
+  border: 1px solid var(--glass-edge-soft);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  overflow: hidden;
+  transition: transform 0.45s cubic-bezier(0.2, 0.9, 0.25, 1),
+    border-color 0.45s ease, background 0.45s ease, box-shadow 0.45s ease;
+}
+.gx-row:hover {
+  transform: translateY(-2px);
+  border-color: var(--glass-edge);
+  background: rgba(255, 255, 255, 0.055);
+  box-shadow: 0 24px 60px -22px rgba(0, 0, 0, 0.7);
+}
+/* muted screenshot ghosting in from the right on hover */
+.gx-row-media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  filter: saturate(0.75) brightness(0.42);
+  -webkit-mask-image: linear-gradient(90deg, transparent 8%, rgba(0, 0, 0, 0.55) 55%, rgba(0, 0, 0, 0.85) 100%);
+  mask-image: linear-gradient(90deg, transparent 8%, rgba(0, 0, 0, 0.55) 55%, rgba(0, 0, 0, 0.85) 100%);
+  transition: opacity 0.6s ease, transform 0.9s cubic-bezier(0.2, 0.9, 0.25, 1);
+  transform: scale(1.06);
+}
+.gx-row:hover .gx-row-media { opacity: 0.55; transform: scale(1); }
+/* aurora sheen that sweeps across on hover (liquid-glass touch) */
+.gx-row-aurora {
+  position: absolute;
+  inset: -50%;
+  z-index: 1;
+  filter: blur(48px);
+  opacity: 0;
+  transform: translateX(-18%);
+  pointer-events: none;
+  transition: opacity 0.55s ease, transform 1s cubic-bezier(0.2, 0.9, 0.25, 1);
+}
+.gx-row:hover .gx-row-aurora { opacity: 0.5; transform: translateX(12%); }
+.gx-row-body { position: relative; z-index: 2; }
+
+/* Touch / no-hover: the sheen + screenshot ghost are hover-gated above, so
+   phones would only ever see flat cards. Give every row a resting aurora glow
+   and a faint screenshot bleed so the glass feels alive, and intensify on tap. */
+@media (hover: none) {
+  .gx-row {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: var(--glass-edge);
+  }
+  .gx-row-aurora { opacity: 0.2; transform: translateX(-24%); }
+  .gx-row-media { opacity: 0.2; transform: scale(1.02); }
+  .gx-row:active {
+    transform: translateY(-1px) scale(0.995);
+    background: rgba(255, 255, 255, 0.07);
+  }
+  .gx-row:active .gx-row-aurora { opacity: 0.5; transform: translateX(8%); }
+  .gx-row:active .gx-row-media { opacity: 0.5; transform: scale(1); }
+}
