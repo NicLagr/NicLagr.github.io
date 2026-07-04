@@ -1,11 +1,29 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { motion } from 'framer-motion';
 import PageShell, { pageFadeUp } from './PageShell';
 import { about, experience, education } from '../../../data/portfolio';
 
+// Interactive 3D bust + personal panels. Lazy so three/the model only load when
+// the About page is actually opened (and only where WebGL is available).
+const AboutScene = lazy(() => import('../AboutScene'));
+const canScene = () => {
+  if (typeof window === 'undefined') return false;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
+  try {
+    const c = document.createElement('canvas');
+    return !!(window.WebGLRenderingContext && (c.getContext('webgl') || c.getContext('experimental-webgl')));
+  } catch { return false; }
+};
+
 /** Dedicated About page — reached by diving into the About face. */
 const AboutPage = () => (
   <PageShell title="Background & skills" maxWidth={980}>
+    {canScene() && (
+      <motion.div variants={pageFadeUp} className="mb-14 -mt-2">
+        <Suspense fallback={null}><AboutScene /></Suspense>
+      </motion.div>
+    )}
+
     <div className="grid lg:grid-cols-5 gap-x-12 gap-y-10 items-start">
       <motion.div variants={pageFadeUp} className="lg:col-span-3">
         {about.bio.map((p, i) => (
