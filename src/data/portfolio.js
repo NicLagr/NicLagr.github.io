@@ -40,7 +40,7 @@ export const experience = [
     location: 'Boston, MA',
     points: [
       'Designed the UX and contributed to frontend for a weather and flight visualization platform (Vue 3, CesiumJS), plus Figma UI design and frontend features for SIGNPOST, an airline emissions-planning SaaS tool.',
-      'Facilitated 12 iterative feedback sessions over 3 months with domain scientists and aviation partners. Their input directly shaped the layer color gradients and legends, the weather station representations, and a dedicated demo mode for executive presentations.',
+      'Facilitated 12 iterative feedback sessions over 3 months with domain scientists and aviation partners. Their input directly shaped the layer color gradients and legends, the wind barbs, and a dedicated demo mode for executive presentations.',
       'Designed and implemented complex interactive features: layer controls (color ramp, opacity, thresholds), GPU-accelerated wind-particle animations, and flight-path and contrail-risk collision detection with time-synced playback. Authored 259 of 369 frontend commits (about 70%) across 26 merged pull requests.',
       'Designed and implemented 10 features end to end for SIGNPOST, a SaaS tool airlines use to evaluate emissions-reduction tradeoffs across fleet upgrades, sustainable aviation fuel, and carbon removals. Built half of its reusable components and all of its icon assets, and led a repo-wide domain refactor across 40+ files with zero regressions.',
       'Built Figma mockups for SIGNPOST’s user-facing pages and data visualizations, aligned to Phase, the SaaS team’s internal design system, and iterated directly with the product manager and lead UX designer. Introduced AI-assisted tools (Figma Make, Claude Code, GitHub Copilot) into the mockup-to-code workflow, cutting revision rounds from 3 to 4 down to 1 to 2 before features were dev-ready.',
@@ -102,7 +102,7 @@ export const projects = [
     summary:
       'A real-time 3D weather and flight visualization tool built in Vue 3 and CesiumJS, for domain scientists and aviation partners to read turbulence, wind, and contrail risk the way they actually need to. I owned both the UX and the frontend: running the research that shaped the interface, designing the view modes and layer system, and building the GPU-accelerated visualizations underneath. It started as a week-long hackathon build and grew into five months of ongoing development. It is internal GE Aerospace work, so this is a technical account without internal links or names.',
     highlights: [
-      'Facilitated 12 user research sessions over 3 months with domain scientists and aviation partners, directly shaping color gradients and legends, weather station representations, and a dedicated demo mode.',
+      'Facilitated 12 user research sessions over 3 months with domain scientists and aviation partners, directly shaping color gradients and legends, wind barbs, and a dedicated demo mode.',
       'Designed the interaction model for comparing weather data: a 3D globe, a flat map, and a regional zoom view, plus a Compare mode that splits the screen into two independently controlled panels.',
       'Designed a two-tier layer system, a one-click quick bar for common layers and a deeper Layer Manager (opacity, palette, per-layer min/max, particle tuning) for domain-scientist power users.',
       'Adapted Phase, a sibling team’s Figma-only design system, into a working Vue component library, extending it to 11+ components, and built the GPU-accelerated wind-particle engineering underneath it.',
@@ -122,7 +122,11 @@ export const projects = [
         },
         {
           heading: 'Twelve conversations with the people who’d use it',
-          body: 'Most of what shaped the interface came from twelve feedback sessions over about three months with domain scientists and aviation partners, walking them through the app and watching where they got stuck. The color gradients and legends on layers like temperature and wind speed got reworked to match how scientists conventionally read that data. The weather station glyphs got adjusted to match station-model conventions the aviation side already knew. I cut the globe and map textures down to whichever ones tested well, and a dedicated demo mode came out of a session about what the tool needed for executive presentations.',
+          body: 'Most of what shaped the interface came from twelve feedback sessions over about three months with domain scientists and aviation partners, walking them through the app and watching where they got stuck. The color gradients and legends on layers like temperature and wind speed got reworked to match how scientists conventionally read that data. I cut the globe and map textures down to whichever ones tested well, and a dedicated demo mode came out of a session about what the tool needed for executive presentations.',
+        },
+        {
+          heading: 'What a meteorologist caught',
+          body: 'The globe also renders wind barbs, the small flagged arrows meteorologists use to read wind speed and direction at a glance, arranged in a grid that gets denser or sparser as you zoom. A meteorologist testing the feature in one of those sessions caught two things. The first was straightforward: the barbs were too small, and the color and outline needed more contrast to read clearly at a distance, so I fixed the size, color, and outline weight. The second was a real gap in what I knew. Wind barbs are supposed to flip which side the feathers sit on depending on hemisphere, clockwise in the Northern Hemisphere, counter-clockwise in the Southern, because that convention makes them point toward the center of a low-pressure system either way. It is how a forecaster spots a storm system at a glance. My implementation did not do this. I had not known the rule existed, so I had built one version for both hemispheres. That is exactly what testing with a real meteorologist is for, catching a domain error I did not know to look for on my own. I fixed the orientation logic, and it mattered beyond just being correct: getting it wrong in front of an actual meteorologist during a customer demo would have cost real credibility.',
         },
         {
           heading: 'Multiple ways to look at the same data',
@@ -143,7 +147,7 @@ export const projects = [
           heading: 'A shared design system, and where it landed',
           body: [
             'The visual design didn’t start from a blank page. A sibling team had already built Phase, a design system in Figma, color and spacing decisions, component patterns, but only as static mockups, nothing in code. I built it into a working Vue component library, extending it to 11+ real components (drawers, legends, sliders, a flight panel, a vertical profile chart) so both apps shared one visual language. I also moved raster tile shading (color ramps, opacity, thresholds) into the browser, decoding tiles to raw pixel data and painting them through a palette lookup table, so changing how a layer looks is instant with no extra network requests.',
-            'By the time I moved on, it had three view modes, a compare mode, 63 renderable weather variables, and a repeat wind query down from 6 seconds to 10 to 13 milliseconds. It ran in real stakeholder demos, and it’s the project that best shows research, design, and engineering working as one thing.',
+            'By the time I moved on, it had three view modes, a compare mode, 63 renderable weather variables, and a repeat wind query down from 6 seconds to 10 to 13 milliseconds. It ran in real demos for international airlines, and it’s the project that best shows research, design, and engineering working as one thing.',
           ],
         },
       ],
