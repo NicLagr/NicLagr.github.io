@@ -146,6 +146,7 @@ function drawContact(ctx, hotspots, sel) {
     { title: 'Email', meta: profile.email, url: `mailto:${profile.email}` },
     { title: 'GitHub', meta: 'github.com/NicLagr', url: profile.links.github },
     { title: 'LinkedIn', meta: 'in/nicolo-lagravinese', url: profile.links.linkedin },
+    { title: 'Behance', meta: 'behance.net/nicololagravi2', url: profile.links.behance },
     { title: 'Résumé', meta: 'PDF', url: profile.links.resume },
   ];
   channels.forEach((c, i) => {

@@ -1,40 +1,42 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { projects } from '../../../data/portfolio';
 import { TbX, TbArrowUpRight, TbCode, TbFileText, TbArrowLeft } from '../icons';
 import SectionLabel from '../SectionLabel';
 import CaseStudyBody from '../CaseStudyBody';
+import ProjectVisual, { canWebGL, VisualCaption } from '../ProjectVisual';
 
 const ease = [0.2, 0.9, 0.25, 1];
 
-const ProjectRow = ({ project, onOpen }) => (
+const ProjectRow = ({ project, onOpen, webglReady }) => (
   <motion.button
     variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }}
     transition={{ duration: 0.55, ease }}
     onClick={() => onOpen(project)}
     className="gx-row gx-selectable group"
   >
-    {project.image && (
-      <span
-        className="gx-row-media"
-        style={{ backgroundImage: `url(${project.image})` }}
-        aria-hidden="true"
-      />
-    )}
     <span className="gx-row-aurora gx-aurora" aria-hidden="true" />
 
-    <div className="gx-row-body flex-1 min-w-0">
-      <div className="flex items-baseline gap-3 flex-wrap">
-        <h3 className="font-semibold gx-display text-xl sm:text-2xl leading-tight">{project.title}</h3>
-        <span className="gx-mono text-xs" style={{ color: 'var(--ink-faint)' }}>{project.year}</span>
+    <div className="gx-row-body flex items-center gap-4 flex-1 min-w-0">
+      <div
+        className="relative flex-none overflow-hidden rounded-xl"
+        style={{ width: 76, height: 76, background: project.accent }}
+      >
+        {project.image ? (
+          <img src={project.image} alt="" className="absolute inset-0 w-full h-full object-cover" />
+        ) : (
+          <ProjectVisual project={project} webglReady={webglReady} />
+        )}
       </div>
-      <div className="mt-1 text-sm" style={{ color: 'var(--ink-dim)' }}>
-        {project.org} · {project.role}
-      </div>
-      <div className="mt-3 flex flex-wrap gap-1.5">
-        {project.tags.slice(0, 5).map((t) => (
-          <span key={t} className="gx-chip !py-1 !px-2">{t}</span>
-        ))}
+
+      <div className="flex-1 min-w-0">
+        <div className="flex items-baseline gap-3 flex-wrap">
+          <h3 className="font-semibold gx-display text-xl sm:text-2xl leading-tight">{project.title}</h3>
+          <span className="gx-mono text-xs" style={{ color: 'var(--ink-faint)' }}>{project.year}</span>
+        </div>
+        <div className="mt-1 text-sm truncate" style={{ color: 'var(--ink-dim)' }}>
+          {project.org} · {project.role}
+        </div>
       </div>
     </div>
 
@@ -65,9 +67,12 @@ export const ProjectSheet = ({ project, onClose }) => {
   // jump back to the top of the sheet when toggling between views
   useEffect(() => { if (scrollRef.current) scrollRef.current.scrollTop = 0; }, [showCase]);
 
+  const webglReady = useMemo(() => canWebGL(), []);
+
   if (!project) return null;
   const { links = {} } = project;
   const hasCaseStudy = !!project.caseStudy;
+  const showVisual = !project.image && webglReady;
 
   return (
     <motion.div
@@ -92,6 +97,7 @@ export const ProjectSheet = ({ project, onClose }) => {
           {project.image && (
             <img src={project.image} alt={project.title} className="absolute inset-0 w-full h-full object-cover" />
           )}
+          {showVisual && <ProjectVisual project={project} webglReady={webglReady} />}
           <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(3,4,10,0.15), rgba(3,4,10,0.78))' }} />
           <button
             onClick={onClose}
@@ -109,6 +115,7 @@ export const ProjectSheet = ({ project, onClose }) => {
         </div>
 
         <div className="p-6 sm:p-8">
+          <VisualCaption show={showVisual} />
           {showCase ? (
             <>
               <button
@@ -118,7 +125,7 @@ export const ProjectSheet = ({ project, onClose }) => {
               >
                 <TbArrowLeft size={16} /> Overview
               </button>
-              <CaseStudyBody project={project} />
+              <CaseStudyBody project={project} showHero={false} showMeta={false} />
             </>
           ) : (
           <>
@@ -206,6 +213,7 @@ export const ProjectSheet = ({ project, onClose }) => {
 
 const WorkSection = () => {
   const [open, setOpen] = useState(null);
+  const webglReady = useMemo(() => canWebGL(), []);
 
   return (
     <section id="work" className="gx-anchor py-24 sm:py-32 px-5">
@@ -220,7 +228,7 @@ const WorkSection = () => {
           className="flex flex-col gap-3"
         >
           {projects.map((p) => (
-            <ProjectRow key={p.id} project={p} onOpen={setOpen} />
+            <ProjectRow key={p.id} project={p} onOpen={setOpen} webglReady={webglReady} />
           ))}
         </motion.div>
       </div>

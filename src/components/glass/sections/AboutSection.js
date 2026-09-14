@@ -9,10 +9,28 @@ const fadeUp = {
   show: { opacity: 1, y: 0, transition: { duration: 0.6, ease } },
 };
 
+// A few real photos, no orbiting labels. Only panels with an actual image get
+// a tile; Fitness/Building never had photos, so they're one line of text below.
+const LIFE_PHOTOS = [
+  {
+    image: process.env.PUBLIC_URL + '/about/gaming.gif',
+    pixel: true,
+    caption: 'Talk to me about video games, retro or new.',
+  },
+  {
+    image: process.env.PUBLIC_URL + '/about/outdoors.jpg',
+    caption: 'Backpacking when I get the chance. Most recently, four days in Iceland.',
+  },
+  {
+    image: process.env.PUBLIC_URL + '/about/lottie.jpg',
+    caption: 'Lottie, my cat.',
+  },
+];
+
 const AboutSection = () => {
   return (
     <section id="about" className="gx-anchor py-20 sm:py-28 px-5">
-      <div className="mx-auto w-full" style={{ maxWidth: 980 }}>
+      <div className="mx-auto w-full" style={{ maxWidth: 720 }}>
         <motion.div
           initial="hidden"
           whileInView="show"
@@ -21,80 +39,72 @@ const AboutSection = () => {
         >
           <SectionLabel index="02">About</SectionLabel>
 
-          <div className="grid lg:grid-cols-5 gap-x-12 gap-y-10 items-start">
-            {/* bio + education — plain text, no panel */}
-            <motion.div variants={fadeUp} className="lg:col-span-3">
-              {about.bio.map((p, i) => (
-                <p
-                  key={i}
-                  className={`leading-relaxed ${i === 0 ? 'text-xl' : 'mt-5 text-lg'}`}
-                  style={{ color: i === 0 ? 'var(--ink)' : 'var(--ink-dim)' }}
-                >
-                  {p}
-                </p>
-              ))}
+          <motion.div variants={fadeUp}>
+            {about.bio.map((p, i) => (
+              <p
+                key={i}
+                className={i === 0 ? 'text-xl leading-relaxed' : 'mt-5 text-lg leading-relaxed'}
+                style={{ color: 'var(--ink-dim)' }}
+              >
+                {p}
+              </p>
+            ))}
+          </motion.div>
 
-              <div className="mt-9 pt-7 border-t" style={{ borderColor: 'var(--glass-edge-soft)' }}>
-                <div className="text-sm font-semibold mb-3" style={{ color: 'var(--ink-faint)' }}>Education</div>
-                <div className="font-semibold text-lg gx-display leading-snug">{education.school}</div>
-                <div className="mt-1.5" style={{ color: 'var(--ink-dim)' }}>{education.degree}</div>
-                <div className="mt-1.5 text-sm" style={{ color: 'var(--ink-faint)' }}>
-                  {education.dates} · {education.detail}
-                </div>
-              </div>
-            </motion.div>
-
-            {/* skills — single glass card for material contrast */}
-            <motion.div variants={fadeUp} className="gx-glass gx-sheen p-7 lg:col-span-2">
-              <div className="text-sm font-semibold mb-5" style={{ color: 'var(--ink-faint)' }}>Toolkit</div>
-              <div className="space-y-4">
-                {Object.entries(about.skills).map(([group, items]) => (
-                  <div key={group}>
-                    <div className="text-sm font-semibold mb-2" style={{ color: 'var(--ink-dim)' }}>{group}</div>
-                    <div className="flex flex-wrap gap-1.5">
-                      {items.map((s) => (
-                        <span key={s} className="gx-chip !py-1 !px-2.5 !text-[11px]">{s}</span>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          </div>
+          <motion.div variants={fadeUp} className="mt-12 pt-7 border-t" style={{ borderColor: 'var(--glass-edge-soft)' }}>
+            <div className="text-sm font-semibold mb-3" style={{ color: 'var(--ink-faint)' }}>Education</div>
+            <div className="font-semibold text-lg gx-display leading-snug">{education.school}</div>
+            <div className="mt-1.5" style={{ color: 'var(--ink-dim)' }}>{education.degree}</div>
+            <div className="mt-1.5 text-sm" style={{ color: 'var(--ink-faint)' }}>
+              {education.dates}
+            </div>
+          </motion.div>
 
           {/* experience — bordered list, not card soup */}
-          <motion.div variants={fadeUp} className="mt-16">
+          <motion.div variants={fadeUp} className="mt-14 pt-7 border-t" style={{ borderColor: 'var(--glass-edge-soft)' }}>
             <div className="text-sm font-semibold mb-2" style={{ color: 'var(--ink-faint)' }}>Experience</div>
-            <div className="border-t" style={{ borderColor: 'var(--glass-edge-soft)' }}>
+            <div>
               {experience.map((job, i) => (
                 <motion.div
                   key={i}
                   variants={fadeUp}
-                  className="py-7 border-b flex flex-col sm:flex-row gap-3 sm:gap-10"
-                  style={{ borderColor: 'var(--glass-edge-soft)' }}
+                  className="py-6 pl-5"
+                  style={{ borderLeft: '2px solid var(--glass-edge-soft)' }}
                 >
-                  <div className="sm:w-56 flex-none">
-                    <div className="font-semibold text-lg gx-display leading-tight">{job.company}</div>
-                    <div className="mt-1 text-sm" style={{ color: 'var(--ink-dim)' }}>{job.dates}</div>
-                    <div className="text-sm" style={{ color: 'var(--ink-faint)' }}>{job.location}</div>
+                  <div className="font-semibold text-lg gx-display leading-tight">{job.company}</div>
+                  <div className="mt-1 text-sm" style={{ color: 'var(--ink-faint)' }}>
+                    {job.dates} · {job.location}
                   </div>
-                  <div className="flex-1">
-                    <div className="font-semibold text-[17px]" style={{ color: 'var(--accent)' }}>
-                      {job.role}
-                      {job.type ? <span style={{ color: 'var(--ink-faint)' }}> · {job.type}</span> : null}
-                    </div>
-                    <ul className="mt-3 space-y-2">
-                      {job.points.map((pt, j) => (
-                        <li key={j} className="flex gap-3 leading-relaxed" style={{ color: 'var(--ink-dim)' }}>
-                          <span className="flex-none mt-2.5 h-px w-3.5" style={{ background: 'var(--accent)' }} />
-                          <span>{pt}</span>
-                        </li>
-                      ))}
-                    </ul>
+                  <div className="mt-2 font-semibold text-[17px]" style={{ color: 'var(--accent)' }}>
+                    {job.role}
+                    {job.type ? <span style={{ color: 'var(--ink-faint)' }}> · {job.type}</span> : null}
                   </div>
+                  <p className="mt-3 leading-relaxed" style={{ color: 'var(--ink-dim)' }}>{job.points[0]}</p>
                 </motion.div>
               ))}
             </div>
+          </motion.div>
+
+          <motion.div variants={fadeUp} className="mt-14 pt-7 border-t" style={{ borderColor: 'var(--glass-edge-soft)' }}>
+            <div className="text-sm font-semibold mb-4" style={{ color: 'var(--ink-faint)' }}>Outside of work</div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {LIFE_PHOTOS.map((p, i) => (
+                <figure key={i} className="gx-glass overflow-hidden" style={{ borderRadius: 16 }}>
+                  <img
+                    src={p.image}
+                    alt=""
+                    className="w-full h-36 object-cover"
+                    style={{ imageRendering: p.pixel ? 'pixelated' : 'auto' }}
+                  />
+                  <figcaption className="p-3 text-sm leading-relaxed" style={{ color: 'var(--ink-dim)' }}>
+                    {p.caption}
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
+            <p className="text-sm leading-relaxed mt-4" style={{ color: 'var(--ink-faint)' }}>
+              I also lift most days, play tennis and pickleball, and build PCs and keyboards.
+            </p>
           </motion.div>
         </motion.div>
       </div>

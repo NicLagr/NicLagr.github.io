@@ -2,6 +2,7 @@ import React, { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useStat
 import { motion } from 'framer-motion';
 import PageShell, { pageFadeUp } from './PageShell';
 import { TbArrowUpRight, TbCode, TbFileText } from '../icons';
+import ProjectVisual, { VisualCaption } from '../ProjectVisual';
 import sfx from '../sfx';
 import { CUBE_PALETTES } from '../cubePalettes';
 import { themeById } from '../cubeThemes';
@@ -172,6 +173,7 @@ const ProjectPage = ({ project, onOpenCaseStudy }) => {
                 onError={(e) => { e.currentTarget.style.display = 'none'; }}
               />
             )}
+            {!project.image && <ProjectVisual project={project} webglReady={cubeReady} />}
             <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(3,4,10,0.05), rgba(3,4,10,0.55))' }} />
           </>
         )}
@@ -183,6 +185,12 @@ const ProjectPage = ({ project, onOpenCaseStudy }) => {
         </motion.div>
       )}
       {liveCube && activeSetting && <div className="mb-10" />}
+
+      {!liveCube && (
+        <motion.div variants={pageFadeUp}>
+          <VisualCaption show={!project.image && !!project.visual && cubeReady} />
+        </motion.div>
+      )}
 
       <motion.div variants={pageFadeUp} className="gx-label mb-3">
         {project.org} · {project.role} · {project.year}

@@ -32,11 +32,11 @@
   --ink-dim: rgba(238, 242, 255, 0.78);
   --ink-faint: rgba(238, 242, 255, 0.54);
 
-  /* ---- Accents (cool, calm — glass-cube blue→green) ---- */
-  --accent: #7aa2ff;
-  --accent-2: #5ee7c6;
-  --accent-3: #8fb4ff;
-  --accent-grad: linear-gradient(120deg, #7aa2ff 0%, #5ee7c6 100%);
+  /* ---- Accents (signature mint, blue as a quiet supporting tone) ---- */
+  --accent: #5ee7c6;
+  --accent-2: #7aa2ff;
+  --accent-3: #8fe9d4;
+  --accent-grad: linear-gradient(120deg, #5ee7c6 0%, #7aa2ff 100%);
 
   --radius: 22px;
   --radius-sm: 14px;
@@ -434,17 +434,14 @@ a, button, [role="button"], .gx-tappable { cursor: pointer; }
 html { scroll-behavior: smooth; }
 
 /* ============================================================
-   Aurora accent system — the hero cube's palette, reused as soft
-   green/blue/violet blooms behind headers and as the hover sheen
-   on the dark-glass rows. Ties the whole page back to the cube.
+   Aurora accent system — restrained to the signature mint + a quiet
+   blue support tone (was a 5-hue rainbow blob). Ties the page back
+   to the cube without competing with real content for attention.
    ============================================================ */
 .gx-aurora {
   background:
-    radial-gradient(58% 58% at 24% 26%, rgba(46, 214, 140, 0.60), transparent 70%),
-    radial-gradient(52% 52% at 74% 30%, rgba(150, 70, 240, 0.55), transparent 70%),
-    radial-gradient(58% 58% at 62% 70%, rgba(236, 58, 150, 0.38), transparent 72%),
-    radial-gradient(54% 54% at 40% 66%, rgba(32, 110, 240, 0.55), transparent 72%),
-    radial-gradient(48% 48% at 52% 94%, rgba(110, 54, 220, 0.5), transparent 72%);
+    radial-gradient(56% 56% at 28% 30%, rgba(94, 231, 198, 0.36), transparent 70%),
+    radial-gradient(52% 52% at 68% 68%, rgba(122, 162, 255, 0.26), transparent 72%);
 }
 
 /* animated header bloom (playful: slow drift, guards reduced-motion) */
@@ -452,11 +449,11 @@ html { scroll-behavior: smooth; }
   position: absolute;
   left: -24px;
   top: 50%;
-  width: 220px;
-  height: 150px;
+  width: 180px;
+  height: 120px;
   transform: translateY(-50%);
   filter: blur(42px);
-  opacity: 0.55;
+  opacity: 0.35;
   pointer-events: none;
   z-index: 0;
   animation: gx-drift 13s ease-in-out infinite;
@@ -518,7 +515,7 @@ html { scroll-behavior: smooth; }
   pointer-events: none;
   transition: opacity 0.55s ease, transform 1s cubic-bezier(0.2, 0.9, 0.25, 1);
 }
-.gx-row:hover .gx-row-aurora { opacity: 0.5; transform: translateX(12%); }
+.gx-row:hover .gx-row-aurora { opacity: 0.3; transform: translateX(12%); }
 .gx-row-body { position: relative; z-index: 2; }
 
 /* Touch / no-hover: the sheen + screenshot ghost are hover-gated above, so
@@ -535,6 +532,6 @@ html { scroll-behavior: smooth; }
     transform: translateY(-1px) scale(0.995);
     background: rgba(255, 255, 255, 0.07);
   }
-  .gx-row:active .gx-row-aurora { opacity: 0.5; transform: translateX(8%); }
+  .gx-row:active .gx-row-aurora { opacity: 0.3; transform: translateX(8%); }
   .gx-row:active .gx-row-media { opacity: 0.5; transform: scale(1); }
 }

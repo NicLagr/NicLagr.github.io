@@ -1,89 +1,92 @@
-import React, { lazy, Suspense } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import PageShell, { pageFadeUp } from './PageShell';
 import { about, experience, education } from '../../../data/portfolio';
 
-// Interactive 3D bust + personal panels. Lazy so three/the model only load when
-// the About page is actually opened (and only where WebGL is available).
-const AboutScene = lazy(() => import('../AboutScene'));
-const canScene = () => {
-  if (typeof window === 'undefined') return false;
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
-  try {
-    const c = document.createElement('canvas');
-    return !!(window.WebGLRenderingContext && (c.getContext('webgl') || c.getContext('experimental-webgl')));
-  } catch { return false; }
-};
+// A few real photos, no 3D, no orbiting labels. Only panels with an actual
+// image get a tile; Fitness/Building never had photos, so they're one line
+// of text below instead of an empty frame.
+const LIFE_PHOTOS = [
+  {
+    image: process.env.PUBLIC_URL + '/about/gaming.gif',
+    pixel: true,
+    caption: 'Talk to me about video games, retro or new.',
+  },
+  {
+    image: process.env.PUBLIC_URL + '/about/outdoors.jpg',
+    caption: 'Backpacking when I get the chance. Most recently, four days in Iceland.',
+  },
+  {
+    image: process.env.PUBLIC_URL + '/about/lottie.jpg',
+    caption: 'Lottie, my cat.',
+  },
+];
 
 /** Dedicated About page — reached by diving into the About face. */
 const AboutPage = () => (
-  <PageShell title="Background & skills" maxWidth={980}>
-    {canScene() && (
-      <motion.div variants={pageFadeUp} className="mb-14 -mt-2">
-        <Suspense fallback={null}><AboutScene /></Suspense>
-      </motion.div>
-    )}
+  <PageShell title="Background & skills" eyebrow="About" maxWidth={720}>
+    <motion.div variants={pageFadeUp}>
+      {about.bio.map((p, i) => (
+        <p
+          key={i}
+          className={i === 0 ? 'text-2xl leading-relaxed' : 'mt-6 text-lg leading-relaxed'}
+          style={{ color: 'var(--ink-dim)' }}
+        >
+          {p}
+        </p>
+      ))}
+    </motion.div>
 
-    <div className="grid lg:grid-cols-5 gap-x-12 gap-y-10 items-start">
-      <motion.div variants={pageFadeUp} className="lg:col-span-3">
-        {about.bio.map((p, i) => (
-          <p key={i} className="text-2xl leading-relaxed" style={{ color: 'var(--ink)' }}>
-            {p}
-          </p>
-        ))}
+    <motion.div variants={pageFadeUp} className="mt-14 pt-8 border-t" style={{ borderColor: 'var(--glass-edge-soft)' }}>
+      <div className="gx-label mb-3">Education</div>
+      <div className="font-semibold text-lg gx-display leading-snug">{education.school}</div>
+      <div className="mt-1.5" style={{ color: 'var(--ink-dim)' }}>{education.degree}</div>
+      <div className="mt-1.5 text-sm" style={{ color: 'var(--ink-faint)' }}>
+        {education.dates}
+      </div>
+    </motion.div>
 
-        <div className="mt-9 pt-7 border-t" style={{ borderColor: 'var(--glass-edge-soft)' }}>
-          <div className="gx-label mb-3">Education</div>
-          <div className="font-semibold text-lg gx-display leading-snug">{education.school}</div>
-          <div className="mt-1.5" style={{ color: 'var(--ink-dim)' }}>{education.degree}</div>
-          <div className="mt-1.5 text-sm" style={{ color: 'var(--ink-faint)' }}>
-            {education.dates} · {education.detail}
-          </div>
-        </div>
-      </motion.div>
-
-      <motion.div variants={pageFadeUp} className="gx-glass gx-sheen p-7 lg:col-span-2">
-        <div className="gx-label mb-4">Frontend & UX</div>
-        <div className="flex flex-wrap gap-1.5">
-          {about.skills.core.map((s) => (
-            <span key={s} className="gx-chip">{s}</span>
-          ))}
-        </div>
-
-        <div className="mt-7 pt-6 border-t" style={{ borderColor: 'var(--glass-edge-soft)' }}>
-          <p className="text-sm leading-relaxed mb-3" style={{ color: 'var(--ink-dim)' }}>
-            {about.adaptNote}
-          </p>
-          <div className="flex flex-wrap gap-1.5">
-            {about.skills.adapts.map((s) => (
-              <span key={s} className="gx-chip !bg-transparent" style={{ color: 'var(--ink-faint)' }}>{s}</span>
-            ))}
-          </div>
-        </div>
-      </motion.div>
-    </div>
-
-    <motion.div variants={pageFadeUp} className="mt-16">
+    <motion.div variants={pageFadeUp} className="mt-14 pt-8 border-t" style={{ borderColor: 'var(--glass-edge-soft)' }}>
       <div className="gx-label mb-2">Experience</div>
-      <div className="border-t" style={{ borderColor: 'var(--glass-edge-soft)' }}>
+      <div>
         {experience.map((job, i) => (
           <div
             key={i}
-            className="py-6 border-b flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-8"
-            style={{ borderColor: 'var(--glass-edge-soft)' }}
+            className="py-6 pl-5"
+            style={{ borderLeft: '2px solid var(--glass-edge-soft)' }}
           >
-            <div className="sm:w-64 flex-none">
-              <div className="font-semibold text-[17px] gx-display leading-tight">{job.role}</div>
-              <div className="mt-0.5 text-sm" style={{ color: 'var(--ink-faint)' }}>
-                {job.company} · {job.dates}
-              </div>
+            <div className="font-semibold text-[17px] gx-display leading-tight">{job.role}</div>
+            <div className="mt-0.5 mb-2 text-sm" style={{ color: 'var(--ink-faint)' }}>
+              {job.company} · {job.dates}
             </div>
-            <div className="flex-1 leading-relaxed" style={{ color: 'var(--ink-dim)' }}>
+            <div className="leading-relaxed" style={{ color: 'var(--ink-dim)' }}>
               {job.points[0]}
             </div>
           </div>
         ))}
       </div>
+    </motion.div>
+
+    <motion.div variants={pageFadeUp} className="mt-14 pt-8 border-t" style={{ borderColor: 'var(--glass-edge-soft)' }}>
+      <div className="gx-label mb-4">Outside of work</div>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {LIFE_PHOTOS.map((p, i) => (
+          <figure key={i} className="gx-glass overflow-hidden" style={{ borderRadius: 16 }}>
+            <img
+              src={p.image}
+              alt=""
+              className="w-full h-36 object-cover"
+              style={{ imageRendering: p.pixel ? 'pixelated' : 'auto' }}
+            />
+            <figcaption className="p-3 text-sm leading-relaxed" style={{ color: 'var(--ink-dim)' }}>
+              {p.caption}
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+      <p className="text-sm leading-relaxed mt-4" style={{ color: 'var(--ink-faint)' }}>
+        I also lift most days, play tennis and pickleball, and build PCs and keyboards.
+      </p>
     </motion.div>
   </PageShell>
 );

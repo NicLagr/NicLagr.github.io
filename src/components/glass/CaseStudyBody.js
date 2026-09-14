@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useMemo } from 'react';
+import ProjectVisual, { canWebGL, VisualCaption } from './ProjectVisual';
 
 /**
  * The written case study for a project: a hero band, a few short sections in the
@@ -14,28 +15,38 @@ const hideFigure = (e) => {
   if (fig) fig.style.display = 'none';
 };
 
-const CaseStudyBody = ({ project }) => {
+// `showHero`/`showMeta` default on for the standalone desktop case-study page,
+// which has no hero/title of its own. The mobile project sheet already shows
+// an image and a "{year} · {org}" caption right above this component, so it
+// passes both false to avoid repeating the same image and metadata twice.
+const CaseStudyBody = ({ project, showHero = true, showMeta = true }) => {
   const cs = project?.caseStudy;
+  const webglReady = useMemo(() => canWebGL(), []);
   if (!cs) return null;
+  const showVisual = showHero && !cs.hero && !!project.visual && webglReady;
 
   return (
     <>
-      {cs.hero && (
+      {showHero && (cs.hero || showVisual) && (
         <div
           className="relative overflow-hidden mb-10"
           style={{ borderRadius: 20, background: project.accent, aspectRatio: '16 / 9' }}
         >
-          <img
-            src={cs.hero}
-            alt={`${project.title} — main view`}
-            className="absolute inset-0 w-full h-full object-cover"
-            onError={hideImg}
-          />
+          {cs.hero && (
+            <img
+              src={cs.hero}
+              alt={`${project.title} — main view`}
+              className="absolute inset-0 w-full h-full object-cover"
+              onError={hideImg}
+            />
+          )}
+          {showVisual && <ProjectVisual project={project} webglReady={webglReady} />}
           <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(3,4,10,0.04), rgba(3,4,10,0.4))' }} />
         </div>
       )}
 
-      <div className="gx-label mb-8">{project.org} · {project.role} · {project.year}</div>
+      <VisualCaption show={showVisual} />
+      {showMeta && <div className="gx-label mb-8">{project.org} · {project.role} · {project.year}</div>}
 
       <div className="space-y-8" style={{ maxWidth: 680 }}>
         {cs.sections.map((s, i) => (

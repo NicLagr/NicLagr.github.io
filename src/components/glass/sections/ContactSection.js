@@ -16,6 +16,7 @@ const channels = [
   { title: 'Email', meta: profile.email, href: `mailto:${profile.email}` },
   { title: 'GitHub', meta: 'github.com/NicLagr', href: profile.links.github },
   { title: 'LinkedIn', meta: 'in/nicolo-lagravinese', href: profile.links.linkedin },
+  { title: 'Behance', meta: 'behance.net/nicololagravi2', href: profile.links.behance },
   { title: 'Résumé', meta: 'PDF', href: profile.links.resume },
 ];
 

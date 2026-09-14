@@ -236,6 +236,9 @@ const CubeConsole = () => {
             <div className="gx-display text-base font-medium tracking-wide" style={{ color: 'var(--ink-dim)' }}>
               {profile.name}
             </div>
+            <div className="text-xs mt-1" style={{ color: 'var(--accent)' }}>
+              {profile.role}
+            </div>
             <motion.div
               className="gx-mono text-[10px] mt-1.5 tracking-[0.3em] uppercase"
               style={{ color: 'var(--ink-faint)' }}
