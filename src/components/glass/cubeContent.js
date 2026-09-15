@@ -11,6 +11,7 @@ import { games } from '../../data/games';
 import { CUBE_PALETTES } from './cubePalettes';
 import { THEME_STYLES, themeFont } from './cubeThemes';
 import { SOUND_THEMES } from './sfx';
+import { getVisualSnapshot, subscribeVisualSnapshotReady, preloadVisualSnapshots } from './visualSnapshot';
 
 const W = 1080; // logical width
 const PAD = 84;
@@ -26,6 +27,143 @@ const setFaceFont = (theme) => { FACE_FONT = themeFont(theme); };
 
 const ROW_H = 116;
 const ROW_GAP = 26;
+
+// Project thumbnails load off the main thread's timing — cache each Image once
+// and notify any subscriber (CubeConsole bumps a tick to force a redraw) so a
+// row upgrades from its accent-gradient placeholder to the real photo as soon
+// as it's ready, instead of blocking the menu on a network round trip.
+const imgCache = new Map();
+const assetListeners = new Set();
+function notifyAssetReady() { assetListeners.forEach((fn) => fn()); }
+export function subscribeAssetReady(fn) {
+  assetListeners.add(fn);
+  return () => assetListeners.delete(fn);
+}
+function getCachedImage(src) {
+  let entry = imgCache.get(src);
+  if (!entry) {
+    const img = new Image();
+    entry = { img, ready: false };
+    img.onload = () => { entry.ready = true; notifyAssetReady(); };
+    img.src = src;
+    imgCache.set(src, entry);
+  }
+  return entry;
+}
+
+// Kick off loads for every Work thumbnail as soon as the cube mounts, so
+// they're usually ready before the visitor ever opens the Work face.
+export function preloadWorkThumbnails() {
+  projects.forEach((p) => { if (p.image) getCachedImage(p.rowMedia || p.image); });
+  games.forEach((g) => { if (g.media?.hero) getCachedImage(g.media.rowMedia || g.media.hero); });
+  preloadVisualSnapshots(projects);
+}
+
+// Re-render the Work menu when either an image finishes loading or an
+// off-screen visual snapshot lands.
+export function subscribeWorkAssetsReady(fn) {
+  const un1 = subscribeAssetReady(fn);
+  const un2 = subscribeVisualSnapshotReady(fn);
+  return () => { un1(); un2(); };
+}
+
+// Mirrors CSS background-position parsing (keywords or percentages) so a
+// project's `mediaPosition` framing lines up between the DOM row and here.
+function parsePercent(v) {
+  if (v === 'left' || v === 'top') return 0;
+  if (v === 'right' || v === 'bottom') return 1;
+  if (v === 'center' || v === undefined) return 0.5;
+  const n = parseFloat(v);
+  return Number.isFinite(n) ? n / 100 : 0.5;
+}
+function parsePosition(pos) {
+  const [px, py] = String(pos || 'center').trim().split(/\s+/);
+  return { px: parsePercent(px), py: parsePercent(py) };
+}
+
+function roundedRectPath(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+// The DOM list uses a full-bleed backdrop per row, but the cube's menu stays
+// sparse by design (see file header) — a wall-to-wall photo fought that. This
+// is the same idea adapted to the format instead: the image sits at the
+// left, like the old square thumbnail, but its edges genuinely dissolve to
+// transparent (via a destination-in alpha mask, not a clipped shape) so it
+// melts into the cube's own glass/aurora material rather than sitting in a
+// hard box. Text starts clear of the fade, not on top of the image.
+const FEATHER_W = 300;
+const FEATHER_H = ROW_H + 28;
+
+function drawFeaturedThumb(ctx, thumb, rowTop) {
+  const x = PAD - 44;
+  const y = rowTop + (ROW_H - FEATHER_H) / 2;
+
+  const buf = document.createElement('canvas');
+  buf.width = FEATHER_W;
+  buf.height = FEATHER_H;
+  const bctx = buf.getContext('2d');
+
+  if (thumb.type === 'img') {
+    const { img } = thumb;
+    const iw = img.naturalWidth || img.width;
+    const ih = img.naturalHeight || img.height;
+    const scale = Math.max(FEATHER_W / iw, FEATHER_H / ih);
+    const sw = FEATHER_W / scale;
+    const sh = FEATHER_H / scale;
+    const { px, py } = parsePosition(thumb.position);
+    const sx = (iw - sw) * px;
+    const sy = (ih - sh) * py;
+    try { bctx.filter = 'saturate(0.9) brightness(0.8)'; } catch (e) { /* unsupported */ }
+    bctx.drawImage(img, sx, sy, sw, sh, 0, 0, FEATHER_W, FEATHER_H);
+    bctx.filter = 'none';
+  } else {
+    const g = bctx.createLinearGradient(0, 0, FEATHER_W, FEATHER_H);
+    g.addColorStop(0, '#5ee7c6');
+    g.addColorStop(1, '#7aa2ff');
+    bctx.fillStyle = g;
+    bctx.fillRect(0, 0, FEATHER_W, FEATHER_H);
+  }
+
+  // fade to transparent toward the right — the actual dissolve
+  bctx.globalCompositeOperation = 'destination-in';
+  const hMask = bctx.createLinearGradient(0, 0, FEATHER_W, 0);
+  hMask.addColorStop(0, 'rgba(0,0,0,0.9)');
+  hMask.addColorStop(0.5, 'rgba(0,0,0,0.65)');
+  hMask.addColorStop(1, 'rgba(0,0,0,0)');
+  bctx.fillStyle = hMask;
+  bctx.fillRect(0, 0, FEATHER_W, FEATHER_H);
+  // and softly at top/bottom so it reads as a vignette, not a strip
+  const vMask = bctx.createLinearGradient(0, 0, 0, FEATHER_H);
+  vMask.addColorStop(0, 'rgba(0,0,0,0)');
+  vMask.addColorStop(0.22, 'rgba(0,0,0,1)');
+  vMask.addColorStop(0.78, 'rgba(0,0,0,1)');
+  vMask.addColorStop(1, 'rgba(0,0,0,0)');
+  bctx.fillStyle = vMask;
+  bctx.fillRect(0, 0, FEATHER_W, FEATHER_H);
+
+  ctx.drawImage(buf, x, y);
+}
+
+// Binary-search the longest prefix (+ "…") that fits maxW, so a long title never
+// draws past the plane's edge — ctx.font must already be set before calling.
+function fitText(ctx, text, maxW) {
+  if (ctx.measureText(text).width <= maxW) return text;
+  let lo = 0;
+  let hi = text.length;
+  while (lo < hi) {
+    const mid = Math.ceil((lo + hi) / 2);
+    const candidate = `${text.slice(0, mid).trimEnd()}…`;
+    if (ctx.measureText(candidate).width <= maxW) lo = mid; else hi = mid - 1;
+  }
+  return `${text.slice(0, lo).trimEnd()}…`;
+}
 
 function wrap(ctx, text, x, y, maxW, lh) {
   const words = String(text).split(' ');
@@ -60,9 +198,12 @@ function header(ctx, label, y) {
 // swells behind it, the title brightens, a chevron appears, and the one detail
 // line is revealed below — all inside a fixed row height so nothing shifts as
 // the cursor moves.
-function entry(ctx, { title, meta, y, selected, action, hotspots }) {
+function entry(ctx, { title, meta, y, selected, action, hotspots, thumb }) {
   const rowTop = y;
   const base = y + 66;
+  const textX = thumb ? PAD + 190 : PAD;
+
+  if (thumb) drawFeaturedThumb(ctx, thumb, rowTop);
 
   if (selected) {
     const cy = rowTop + ROW_H / 2;
@@ -84,7 +225,7 @@ function entry(ctx, { title, meta, y, selected, action, hotspots }) {
 
   ctx.font = `600 58px ${FACE_FONT}`;
   ctx.fillStyle = selected ? INK : 'rgba(245,247,255,0.58)';
-  ctx.fillText(title, PAD, base);
+  ctx.fillText(fitText(ctx, title, W - PAD - textX - (selected ? 90 : 40)), textX, base);
 
   if (selected) {
     ctx.font = `300 46px ${FACE_FONT}`;
@@ -95,7 +236,7 @@ function entry(ctx, { title, meta, y, selected, action, hotspots }) {
     if (meta) {
       ctx.font = `400 34px ${FACE_FONT}`;
       ctx.fillStyle = DIM;
-      ctx.fillText(meta, PAD, base + 38);
+      ctx.fillText(fitText(ctx, meta, W - PAD - textX), textX, base + 38);
     }
   }
 
@@ -107,6 +248,15 @@ function drawWork(ctx, hotspots, sel) {
   header(ctx, 'Work', 128);
   let y = 198;
   projects.forEach((p, i) => {
+    let thumb = { type: 'gradient' };
+    if (p.image) {
+      const src = p.rowMedia || p.image;
+      const cached = getCachedImage(src);
+      if (cached.ready) thumb = { type: 'img', img: cached.img, position: p.rowMedia ? 'center' : p.mediaPosition };
+    } else if (p.visual) {
+      const snap = getVisualSnapshot(p.visual, p.visualColors);
+      if (snap.ready) thumb = { type: 'img', img: snap.canvas };
+    }
     y = entry(ctx, {
       title: p.title,
       meta: `${p.org} · ${p.year}`,
@@ -114,6 +264,7 @@ function drawWork(ctx, hotspots, sel) {
       selected: i === sel,
       action: { type: 'project', id: p.id },
       hotspots,
+      thumb,
     });
   });
   return y;
@@ -123,6 +274,11 @@ function drawPlay(ctx, hotspots, sel) {
   header(ctx, 'Play', 128);
   let y = 198;
   games.forEach((g, i) => {
+    let thumb = null;
+    if (g.media?.hero) {
+      const cached = getCachedImage(g.media.rowMedia || g.media.hero);
+      if (cached.ready) thumb = { type: 'img', img: cached.img };
+    }
     y = entry(ctx, {
       title: g.title,
       meta: `${(g.genres || []).slice(0, 2).join(' · ')} · ${g.year}`,
@@ -130,6 +286,7 @@ function drawPlay(ctx, hotspots, sel) {
       selected: i === sel,
       action: { type: 'game', slug: g.slug },
       hotspots,
+      thumb,
     });
   });
   return y;
@@ -159,7 +316,13 @@ function drawContact(ctx, hotspots, sel) {
       hotspots,
     });
   });
-  return y;
+
+  // matches the copyright footer on the scrollable (mobile/accessible) layout's
+  // ContactSection — the cube's Contact face is the desktop equivalent
+  ctx.font = `400 24px ${FACE_FONT}`;
+  ctx.fillStyle = FAINT;
+  ctx.fillText(`© ${new Date().getFullYear()} ${profile.name}`, PAD, y + 20);
+  return y + 60;
 }
 
 // `about` has no cube menu — it opens straight to a dedicated page.

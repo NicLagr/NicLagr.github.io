@@ -489,21 +489,23 @@ html { scroll-behavior: smooth; }
   background: rgba(255, 255, 255, 0.055);
   box-shadow: 0 24px 60px -22px rgba(0, 0, 0, 0.7);
 }
-/* muted screenshot ghosting in from the right on hover */
+/* project photo (or live decorative visual) as the row's own backdrop —
+   strongest fade under the title on the left, showing through more toward
+   the empty right side; hover just intensifies and settles it */
 .gx-row-media {
   position: absolute;
   inset: 0;
   z-index: 0;
   background-size: cover;
   background-position: center;
-  opacity: 0;
-  filter: saturate(0.75) brightness(0.42);
+  opacity: 0.6;
+  filter: saturate(0.85) brightness(0.55);
   -webkit-mask-image: linear-gradient(90deg, transparent 8%, rgba(0, 0, 0, 0.55) 55%, rgba(0, 0, 0, 0.85) 100%);
   mask-image: linear-gradient(90deg, transparent 8%, rgba(0, 0, 0, 0.55) 55%, rgba(0, 0, 0, 0.85) 100%);
   transition: opacity 0.6s ease, transform 0.9s cubic-bezier(0.2, 0.9, 0.25, 1);
-  transform: scale(1.06);
+  transform: scale(1.04);
 }
-.gx-row:hover .gx-row-media { opacity: 0.55; transform: scale(1); }
+.gx-row:hover .gx-row-media { opacity: 0.85; transform: scale(1); }
 /* aurora sheen that sweeps across on hover (liquid-glass touch) */
 .gx-row-aurora {
   position: absolute;
@@ -518,20 +520,19 @@ html { scroll-behavior: smooth; }
 .gx-row:hover .gx-row-aurora { opacity: 0.3; transform: translateX(12%); }
 .gx-row-body { position: relative; z-index: 2; }
 
-/* Touch / no-hover: the sheen + screenshot ghost are hover-gated above, so
-   phones would only ever see flat cards. Give every row a resting aurora glow
-   and a faint screenshot bleed so the glass feels alive, and intensify on tap. */
+/* Touch / no-hover: the sheen is hover-gated above, so give every row a
+   resting aurora glow, and intensify both on tap. */
 @media (hover: none) {
   .gx-row {
     background: rgba(255, 255, 255, 0.04);
     border-color: var(--glass-edge);
   }
   .gx-row-aurora { opacity: 0.2; transform: translateX(-24%); }
-  .gx-row-media { opacity: 0.2; transform: scale(1.02); }
+  .gx-row-media { transform: scale(1.02); }
   .gx-row:active {
     transform: translateY(-1px) scale(0.995);
     background: rgba(255, 255, 255, 0.07);
   }
   .gx-row:active .gx-row-aurora { opacity: 0.3; transform: translateX(8%); }
-  .gx-row:active .gx-row-media { opacity: 0.5; transform: scale(1); }
+  .gx-row:active .gx-row-media { opacity: 0.85; transform: scale(1); }
 }

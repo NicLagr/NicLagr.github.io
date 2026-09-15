@@ -1,5 +1,10 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import ProjectVisual, { canWebGL, VisualCaption } from './ProjectVisual';
+import { TbX, TbChevronLeft, TbChevronRight } from './icons';
+
+const ease = [0.2, 0.9, 0.25, 1];
 
 /**
  * The written case study for a project: a hero band, a few short sections in the
@@ -10,10 +15,7 @@ import ProjectVisual, { canWebGL, VisualCaption } from './ProjectVisual';
  * shows a torn image while assets are still being dropped in.
  */
 const hideImg = (e) => { e.currentTarget.style.display = 'none'; };
-const hideFigure = (e) => {
-  const fig = e.currentTarget.closest('figure');
-  if (fig) fig.style.display = 'none';
-};
+const hideTile = (e) => { e.currentTarget.style.display = 'none'; };
 
 // `showHero`/`showMeta` default on for the standalone desktop case-study page,
 // which has no hero/title of its own. The mobile project sheet already shows
@@ -22,6 +24,23 @@ const hideFigure = (e) => {
 const CaseStudyBody = ({ project, showHero = true, showMeta = true }) => {
   const cs = project?.caseStudy;
   const webglReady = useMemo(() => canWebGL(), []);
+  const gallery = cs?.gallery || [];
+  const [lightbox, setLightbox] = useState(null); // index into gallery, or null
+
+  const step = (dir) => setLightbox((i) => (i === null ? null : (i + dir + gallery.length) % gallery.length));
+
+  useEffect(() => {
+    if (lightbox === null) return undefined;
+    const onKey = (e) => {
+      if (e.key === 'Escape') setLightbox(null);
+      else if (e.key === 'ArrowRight') step(1);
+      else if (e.key === 'ArrowLeft') step(-1);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lightbox, gallery.length]);
+
   if (!cs) return null;
   const showVisual = showHero && !cs.hero && !!project.visual && webglReady;
 
@@ -77,30 +96,97 @@ const CaseStudyBody = ({ project, showHero = true, showMeta = true }) => {
         </figure>
       )}
 
-      {cs.gallery && cs.gallery.length > 0 && (
-        <div className="mt-12 space-y-8">
-          {cs.gallery.map((g, i) => (
-            <figure key={i}>
-              <div
-                className="relative overflow-hidden"
-                style={{ borderRadius: 16, background: '#05060e', border: '1px solid var(--glass-edge-soft)' }}
-              >
-                <img
-                  src={g.src}
-                  alt={g.caption || ''}
-                  loading="lazy"
-                  className="w-full h-auto block"
-                  onError={hideFigure}
-                />
-              </div>
+      {gallery.length > 0 && (
+        <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 gap-4" style={{ maxWidth: 680 }}>
+          {gallery.map((g, i) => (
+            <button
+              key={i}
+              onClick={() => setLightbox(i)}
+              className="relative overflow-hidden text-left group gx-selectable"
+              style={{ borderRadius: 16, background: '#05060e', border: '1px solid var(--glass-edge-soft)', aspectRatio: '4 / 3' }}
+            >
+              <img
+                src={g.src}
+                alt={g.caption || ''}
+                loading="lazy"
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                onError={hideTile}
+              />
               {g.caption && (
-                <figcaption className="mt-2.5 text-sm leading-relaxed" style={{ color: 'var(--ink-dim)', maxWidth: 680 }}>
+                <span
+                  className="absolute inset-x-0 bottom-0 p-3 text-xs leading-snug line-clamp-2"
+                  style={{ background: 'linear-gradient(180deg, transparent, rgba(3,4,10,0.88) 70%)', color: 'var(--ink-dim)' }}
+                >
                   {g.caption}
-                </figcaption>
+                </span>
               )}
-            </figure>
+            </button>
           ))}
         </div>
+      )}
+
+      {createPortal(
+      <AnimatePresence>
+        {lightbox !== null && gallery[lightbox] && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[1250] grid place-items-center p-4 sm:p-10"
+            onClick={() => setLightbox(null)}
+          >
+            <div className="absolute inset-0" style={{ background: 'rgba(3,4,10,0.85)', backdropFilter: 'blur(10px)' }} />
+            <button
+              onClick={() => setLightbox(null)}
+              aria-label="Close"
+              className="!absolute top-5 right-5 gx-glass w-10 h-10 rounded-full grid place-items-center z-10"
+            >
+              <TbX size={20} />
+            </button>
+            {gallery.length > 1 && (
+              <>
+                <button
+                  onClick={(e) => { e.stopPropagation(); step(-1); }}
+                  aria-label="Previous image"
+                  className="!absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 gx-glass w-10 h-10 rounded-full grid place-items-center z-10"
+                >
+                  <TbChevronLeft size={20} />
+                </button>
+                <button
+                  onClick={(e) => { e.stopPropagation(); step(1); }}
+                  aria-label="Next image"
+                  className="!absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 gx-glass w-10 h-10 rounded-full grid place-items-center z-10"
+                >
+                  <TbChevronRight size={20} />
+                </button>
+              </>
+            )}
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="relative flex flex-col items-center"
+              style={{ maxWidth: '90vw', maxHeight: '90vh' }}
+            >
+              <motion.img
+                key={lightbox}
+                src={gallery[lightbox].src}
+                alt={gallery[lightbox].caption || ''}
+                initial={{ opacity: 0, scale: 0.96 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.96 }}
+                transition={{ duration: 0.3, ease }}
+                className="block"
+                style={{ borderRadius: 16, maxWidth: '90vw', maxHeight: '75vh', objectFit: 'contain' }}
+              />
+              {gallery[lightbox].caption && (
+                <p className="mt-4 text-sm leading-relaxed text-center" style={{ color: 'var(--ink-dim)', maxWidth: 640 }}>
+                  {gallery[lightbox].caption}
+                </p>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>,
+      document.body
       )}
     </>
   );

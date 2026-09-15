@@ -65,8 +65,8 @@ const HomeSection = ({ onNavigate }) => {
             href={profile.links.resume}
             target="_blank"
             rel="noopener noreferrer"
-            className="transition-colors hover:text-[var(--ink)]"
-            style={{ color: 'var(--ink-dim)' }}
+            className="inline-block transition-colors hover:text-[var(--ink)]"
+            style={{ color: 'var(--ink-dim)', padding: '14px 4px', margin: '-14px -4px' }}
           >
             Résumé
           </a>
@@ -133,8 +133,8 @@ const HomeSection = ({ onNavigate }) => {
           href={profile.links.resume}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-8 inline-block text-sm"
-          style={{ color: 'var(--ink-dim)' }}
+          className="inline-block text-sm"
+          style={{ color: 'var(--ink-dim)', padding: '14px 4px', margin: '18px -4px -14px' }}
         >
           Résumé →
         </motion.a>

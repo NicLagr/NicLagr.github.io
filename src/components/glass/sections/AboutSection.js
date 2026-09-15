@@ -27,6 +27,11 @@ const LIFE_PHOTOS = [
   },
 ];
 
+const hideFigure = (e) => {
+  const fig = e.currentTarget.closest('figure');
+  if (fig) fig.style.display = 'none';
+};
+
 const AboutSection = () => {
   return (
     <section id="about" className="gx-anchor py-20 sm:py-28 px-5">
@@ -95,6 +100,7 @@ const AboutSection = () => {
                     alt=""
                     className="w-full h-36 object-cover"
                     style={{ imageRendering: p.pixel ? 'pixelated' : 'auto' }}
+                    onError={hideFigure}
                   />
                   <figcaption className="p-3 text-sm leading-relaxed" style={{ color: 'var(--ink-dim)' }}>
                     {p.caption}

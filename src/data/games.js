@@ -98,6 +98,9 @@ export const games = [
     },
     media: {
       hero: getImagePath('/games/hellfire/hero.png'),
+      // pre-cropped wide band for the Work-style row backdrop — a plain cover
+      // crop of the full screenshot cuts the demon off in a wide-short row
+      rowMedia: getImagePath('/games/hellfire/hero-wide.jpg'),
       gallery: [
         getImagePath('/games/hellfire/screen-1.png'),
         getImagePath('/games/hellfire/screen-2.png'),
@@ -147,6 +150,9 @@ export const games = [
     },
     media: {
       hero: getImagePath('/games/rolling-siege/hero.png'),
+      // pre-cropped wide band centered on the player ring — the default crop
+      // landed on an NPC instead, well above the actual player character
+      rowMedia: getImagePath('/games/rolling-siege/hero-wide.jpg'),
       gallery: [
         getImagePath('/games/rolling-siege/screen-1.png'),
         getImagePath('/games/rolling-siege/screen-2.png')

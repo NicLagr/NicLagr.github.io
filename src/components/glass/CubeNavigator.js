@@ -657,12 +657,15 @@ const CubeNavigator = ({ onNavigate, size = 380, started = true, onStart, active
       // settles, so we never flash mirrored/back-facing or warped text
       const introReveal = reduce ? 1 : Math.max(0, Math.min(1, (bt - 0.75) / 0.2));
 
-      // labels
+      // labels — fade out quickly once a face opens (active), so stale label
+      // text doesn't linger and bleed through behind the new menu content while
+      // `focus` itself is still easing toward 1
       const emphId = hovered ? hovered.userData.face.id : highlightRef.current;
+      const labelRate = active ? 0.45 : 0.2;
       labels.forEach((l) => {
         const isE = l.userData.face.id === emphId;
         const target = (1 - focus) * introReveal * (isE ? 1 : emphId ? 0.66 : 0.94);
-        l.material.opacity += (target - l.material.opacity) * 0.2;
+        l.material.opacity += (target - l.material.opacity) * labelRate;
         const sc = isE && !active ? 1.08 : 1;
         l.scale.x += (sc - l.scale.x) * 0.2;
         l.scale.y = l.scale.x;

@@ -6,6 +6,8 @@ import sfx from '../sfx';
 
 const ease = [0.2, 0.9, 0.25, 1];
 
+const hideParent = (e) => { e.currentTarget.parentElement.style.display = 'none'; };
+
 /** Dedicated game view — a short line on what it is, then the gallery does the talking. */
 const GamePage = ({ game }) => {
   const [lightbox, setLightbox] = useState(null);
@@ -25,7 +27,7 @@ const GamePage = ({ game }) => {
           className="relative overflow-hidden mb-10"
           style={{ borderRadius: 24, aspectRatio: '16 / 8' }}
         >
-          <img src={game.media.hero} alt={game.title} className="absolute inset-0 w-full h-full object-cover" />
+          <img src={game.media.hero} alt={game.title} className="absolute inset-0 w-full h-full object-cover" onError={hideParent} />
           <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(3,4,10,0.05), rgba(3,4,10,0.5))' }} />
         </motion.div>
       )}
@@ -63,6 +65,7 @@ const GamePage = ({ game }) => {
                   alt={`${game.title} screenshot ${i + 1}`}
                   loading="lazy"
                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  onError={hideParent}
                 />
               </button>
             ))}

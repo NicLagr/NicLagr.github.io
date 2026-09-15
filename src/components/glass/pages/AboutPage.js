@@ -22,6 +22,11 @@ const LIFE_PHOTOS = [
   },
 ];
 
+const hideFigure = (e) => {
+  const fig = e.currentTarget.closest('figure');
+  if (fig) fig.style.display = 'none';
+};
+
 /** Dedicated About page — reached by diving into the About face. */
 const AboutPage = () => (
   <PageShell title="Background & skills" eyebrow="About" maxWidth={720}>
@@ -77,6 +82,7 @@ const AboutPage = () => (
               alt=""
               className="w-full h-36 object-cover"
               style={{ imageRendering: p.pixel ? 'pixelated' : 'auto' }}
+              onError={hideFigure}
             />
             <figcaption className="p-3 text-sm leading-relaxed" style={{ color: 'var(--ink-dim)' }}>
               {p.caption}

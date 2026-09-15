@@ -10,14 +10,103 @@ import WorkSection from '../../components/glass/sections/WorkSection';
 import AboutSection from '../../components/glass/sections/AboutSection';
 import PlaySection from '../../components/glass/sections/PlaySection';
 import ContactSection from '../../components/glass/sections/ContactSection';
+import { TbList, Tb3DCubeSphere } from '../../components/glass/icons';
 
 const ease = [0.2, 0.9, 0.25, 1];
 
+// Measured directly off SoundToggle's actual rendered box (gx-btn + !p-2 +
+// a 17px icon + 1px border = 35px) — hardcoding a round number here instead
+// was the bug: it drew a visibly bigger, uncentered circle next to it.
+const COLLAPSED = 35;
+const ICON_BOX = 17;
+const ICON_GAP = 8;
+const PAD_RIGHT = 16;
+
+// A quiet circular icon (matches SoundToggle) that expands into a pill on
+// hover/focus, revealing what it does in plain words. Animates real pixel
+// width (measured from the label once, on mount) rather than Framer Motion's
+// `layout`/FLIP technique — FLIP scales the whole subtree via a transform,
+// which visibly stretches the label text mid-animation; a true width tween
+// with `overflow: hidden` reveals it cleanly instead. Hover is bound to a
+// stable, non-resizing wrapper so the animation can never re-trigger itself.
+const ExpandingIconButton = ({ wrapperClassName, label, onClick, children }) => {
+  const [hover, setHover] = useState(false);
+  const labelRef = useRef(null);
+  const [labelWidth, setLabelWidth] = useState(0);
+  useEffect(() => {
+    if (labelRef.current) setLabelWidth(labelRef.current.getBoundingClientRect().width);
+  }, [label]);
+
+  const expandedWidth = COLLAPSED + ICON_GAP + labelWidth + PAD_RIGHT;
+
+  return (
+    <div
+      className={`fixed z-[70] pointer-events-auto flex items-center justify-end ${wrapperClassName}`}
+      style={{ width: expandedWidth + 8, height: COLLAPSED }}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+    >
+      <motion.button
+        onClick={onClick}
+        onFocus={() => setHover(true)}
+        onBlur={() => setHover(false)}
+        aria-label={label}
+        animate={{ width: hover ? expandedWidth : COLLAPSED }}
+        transition={{ duration: 0.38, ease }}
+        className="gx-btn gx-selectable"
+        style={{
+          // every box-model property forced inline (highest specificity) so
+          // .gx-btn's own padding/gap/display can never fight this component's
+          // sizing — only its visual treatment (bg/border/blur/color) is reused
+          height: COLLAPSED,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'flex-start',
+          padding: 0,
+          // gx-btn has a 1px border (box-sizing: border-box), so the actual
+          // content area is COLLAPSED - 2, not COLLAPSED — centering against
+          // the full box left the icon 1px right of true center
+          paddingLeft: (COLLAPSED - 2 - ICON_BOX) / 2,
+          gap: 0,
+          overflow: 'hidden',
+        }}
+      >
+        <span
+          className="grid place-items-center flex-none"
+          style={{ width: ICON_BOX, height: ICON_BOX, lineHeight: 0 }}
+        >
+          {children}
+        </span>
+        <span
+          ref={labelRef}
+          className="whitespace-nowrap text-sm font-medium flex-none"
+          style={{
+            marginLeft: ICON_GAP,
+            opacity: hover ? 1 : 0,
+            transition: `opacity 0.2s ease ${hover ? '0.14s' : '0s'}`,
+          }}
+        >
+          {label}
+        </span>
+      </motion.button>
+    </div>
+  );
+};
+
 // Pointer-capable, roomy screens get the cube shell (the app-like console menu);
-// touch / small screens fall back to the scrollable page.
-const shellCapable = () =>
-  typeof window !== 'undefined' &&
-  window.matchMedia('(min-width: 768px) and (hover: hover)').matches;
+// touch / small screens, reduced-motion, and no-WebGL fall back to the scrollable
+// page (mirrors HomeSection's canCube() check on the mobile path).
+const shellCapable = () => {
+  if (typeof window === 'undefined') return false;
+  if (!window.matchMedia('(min-width: 768px) and (hover: hover)').matches) return false;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
+  try {
+    const c = document.createElement('canvas');
+    return !!(window.WebGLRenderingContext && (c.getContext('webgl') || c.getContext('experimental-webgl')));
+  } catch (e) {
+    return false;
+  }
+};
 
 // The page is a single scroll; the cube + ← → / gamepad drive navigation now
 // that the top bar is gone. Order is the scroll/step order.
@@ -29,7 +118,10 @@ const SECTIONS = [
   { id: 'contact' },
 ];
 
-const GlassPortfolio = () => {
+// `accessibleMode` comes from App.js's "Skip to content" link — the cube shell has
+// no #home anchor for that link to reach, so activating it instead swaps in the
+// same accessible list layout touch/reduced-motion visitors already get.
+const GlassPortfolio = ({ accessibleMode = false, onAccessibleModeChange }) => {
   const [active, setActive] = useState('home');
   const [sweepKey, setSweepKey] = useState(0);
   const [sweeping, setSweeping] = useState(false);
@@ -112,10 +204,19 @@ const GlassPortfolio = () => {
 
   // Desktop / pointer: the cube IS the site — menu on the cube, sections open as
   // a screen on the selected face (CubeConsole). Touch / small screens scroll.
-  if (useShell) {
+  if (useShell && !accessibleMode) {
     return (
       <div style={{ position: 'relative', minHeight: '100vh' }}>
         <GlassBackground />
+        {/* visible-but-quiet opt-out for anyone who'd rather skim a plain list
+            than drive the cube */}
+        <ExpandingIconButton
+          wrapperClassName="right-20 top-6"
+          label="Switch to List View"
+          onClick={() => onAccessibleModeChange(true)}
+        >
+          <TbList size={17} />
+        </ExpandingIconButton>
         {/* no boot overlay here — the navigator cube spins itself into the menu */}
         <CubeConsole />
       </div>
@@ -125,7 +226,19 @@ const GlassPortfolio = () => {
   return (
     <div className="gx-scroll" style={{ position: 'relative', minHeight: '100vh' }}>
       <GlassBackground />
-      <DesktopHint />
+      {/* only a genuine capability fallback (touch/reduced-motion/no-webgl) needs
+          pointing back to the full desktop experience — not a deliberate opt-out */}
+      {!accessibleMode && <DesktopHint />}
+      {/* only offer a way back to the cube if they actually have one to go back to */}
+      {useShell && accessibleMode && (
+        <ExpandingIconButton
+          wrapperClassName="right-6 top-6"
+          label="Switch to Cube View"
+          onClick={() => onAccessibleModeChange(false)}
+        >
+          <Tb3DCubeSphere size={17} />
+        </ExpandingIconButton>
+      )}
       <ConsoleInput onStep={stepSection} />
 
       <main>

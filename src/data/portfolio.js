@@ -222,7 +222,10 @@ export const projects = [
       'Vault-managed secrets and TLS via cert-manager, running in production during live executive tours.',
     ],
     tags: ['React', 'Node.js', 'Redshift', 'Kubernetes', 'Argo CD', 'AWS'],
-    image: getImagePath('/projects/mission-control/hero-globe.png'),
+    image: getImagePath('/projects/mission-control/hero-globe.jpg'),
+    // the globe sits left-of-center in the source frame; a plain center crop
+    // shows the stats panel instead
+    mediaPosition: '25% 45%',
     accent: 'var(--accent-grad)',
     video: {
       src: getImagePath('/projects/mission-control/hannover-messe.mp4'),
@@ -231,7 +234,7 @@ export const projects = [
       href: 'https://www.linkedin.com/feed/update/urn:li:activity:7452619781264007168/',
     },
     caseStudy: {
-      hero: getImagePath('/projects/mission-control/hero-globe.png'),
+      hero: getImagePath('/projects/mission-control/hero-globe.jpg'),
       sections: [
         {
           heading: 'The brief',
@@ -256,11 +259,11 @@ export const projects = [
           caption: 'Live events and active interfaces plotted across the globe',
         },
         {
-          src: getImagePath('/projects/mission-control/dev-broken.png'),
+          src: getImagePath('/projects/mission-control/dev-broken.jpg'),
           caption: 'A rendering bug in development, event beams streaking off the globe',
         },
         {
-          src: getImagePath('/projects/mission-control/design-1.png'),
+          src: getImagePath('/projects/mission-control/design-1.jpg'),
           caption: 'Early layout in Figma',
         },
       ],
@@ -404,11 +407,11 @@ export const projects = [
           caption: 'Machine-vision part counting on the hardware wall, shown at Automate 2025 in Detroit',
         },
         {
-          src: getImagePath('/projects/tec-demos/hardware-wall.png'),
+          src: getImagePath('/projects/tec-demos/hardware-wall.jpg'),
           caption: 'The Composable HMI wall, a mobile rack of stacked Tulip interfaces',
         },
         {
-          src: getImagePath('/projects/tec-demos/pharma-kit.png'),
+          src: getImagePath('/projects/tec-demos/pharma-kit.jpg'),
           caption: 'A life sciences travel kit at a pharma tradeshow, built around a Wave Bioreactor workflow',
         },
       ],
@@ -430,7 +433,7 @@ export const projects = [
       'Presented the working prototype at Northeastern’s RISE expo, funded by a PEAK Experience Award.',
     ],
     tags: ['Figma', 'React', 'UX', 'Accessibility', 'Healthcare'],
-    image: getImagePath('/projects/nurture-nest/app-screens.png'),
+    image: getImagePath('/projects/nurture-nest/app-screens.jpg'),
     accent: 'var(--accent-grad)',
     caseStudy: {
       sections: [
@@ -456,7 +459,7 @@ export const projects = [
       ],
       gallery: [
         {
-          src: getImagePath('/projects/nurture-nest/app-screens.png'),
+          src: getImagePath('/projects/nurture-nest/app-screens.jpg'),
           caption: 'The home screen and weekly wellness tracker, with symptom logging, appointment reminders, and a color-coded symptom key',
         },
         {
@@ -483,6 +486,10 @@ export const projects = [
     ],
     tags: ['UX Design', 'Vue 3', 'TypeScript', 'C++', 'WebSocket', 'PWA', 'Capacitor'],
     image: getImagePath('/projects/newvegas/pipboy-status.png'),
+    // the Work row is extremely wide-and-short, so a plain cover-crop of the
+    // full screenshot only ever shows a thin sliver (just the forehead) —
+    // this is a pre-cropped, already-framed band around the vault boy instead
+    rowMedia: getImagePath('/projects/newvegas/pipboy-status-wide.jpg'),
     accent: 'var(--accent-grad)',
     caseStudy: {
       sections: [
@@ -525,7 +532,7 @@ export const projects = [
           caption: 'The inventory tab, listing weapons and ammo with per-item detail',
         },
         {
-          src: getImagePath('/projects/newvegas/mojave-map.png'),
+          src: getImagePath('/projects/newvegas/mojave-map.jpg'),
           caption: 'The Mojave Wasteland map, with discovered locations marked across the region',
         },
       ],
@@ -549,7 +556,10 @@ export const projects = [
       'Hand-built design system (tokens + primitives) in React, Tailwind, and Framer Motion, tuned to high Lighthouse scores.',
     ],
     tags: ['React', 'Three.js', 'Tailwind', 'Framer Motion', 'Design System'],
-    image: getImagePath('/projects/portfolio/hero.png'),
+    image: getImagePath('/projects/portfolio/hero.jpg'),
+    // pre-cropped wide band around the cube itself — the square source shows
+    // mostly empty space above/below it once forced into the wide Work row
+    rowMedia: getImagePath('/projects/portfolio/hero-wide.jpg'),
     accent: 'var(--accent-grad)',
     caseStudy: {
       sections: [

@@ -8,6 +8,8 @@ import ProjectVisual, { canWebGL, VisualCaption } from '../ProjectVisual';
 
 const ease = [0.2, 0.9, 0.25, 1];
 
+const hideImg = (e) => { e.currentTarget.style.display = 'none'; };
+
 const ProjectRow = ({ project, onOpen, webglReady }) => (
   <motion.button
     variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }}
@@ -15,20 +17,22 @@ const ProjectRow = ({ project, onOpen, webglReady }) => (
     onClick={() => onOpen(project)}
     className="gx-row gx-selectable group"
   >
+    {project.image ? (
+      <div
+        className="gx-row-media"
+        style={{
+          backgroundImage: `url(${project.rowMedia || project.image})`,
+          backgroundPosition: project.rowMedia ? 'center' : (project.mediaPosition || 'center'),
+        }}
+      />
+    ) : (
+      <div className="gx-row-media">
+        <ProjectVisual project={project} webglReady={webglReady} />
+      </div>
+    )}
     <span className="gx-row-aurora gx-aurora" aria-hidden="true" />
 
     <div className="gx-row-body flex items-center gap-4 flex-1 min-w-0">
-      <div
-        className="relative flex-none overflow-hidden rounded-xl"
-        style={{ width: 76, height: 76, background: project.accent }}
-      >
-        {project.image ? (
-          <img src={project.image} alt="" className="absolute inset-0 w-full h-full object-cover" />
-        ) : (
-          <ProjectVisual project={project} webglReady={webglReady} />
-        )}
-      </div>
-
       <div className="flex-1 min-w-0">
         <div className="flex items-baseline gap-3 flex-wrap">
           <h3 className="font-semibold gx-display text-xl sm:text-2xl leading-tight">{project.title}</h3>
@@ -95,7 +99,13 @@ export const ProjectSheet = ({ project, onClose }) => {
       >
         <div className="relative h-44 sm:h-56" style={{ background: project.accent }}>
           {project.image && (
-            <img src={project.image} alt={project.title} className="absolute inset-0 w-full h-full object-cover" />
+            <img
+              src={project.image}
+              alt={project.title}
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{ objectPosition: project.mediaPosition || 'center' }}
+              onError={hideImg}
+            />
           )}
           {showVisual && <ProjectVisual project={project} webglReady={webglReady} />}
           <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(3,4,10,0.15), rgba(3,4,10,0.78))' }} />

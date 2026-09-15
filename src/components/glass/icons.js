@@ -18,6 +18,9 @@ export {
   TbPalette,
   TbX,
   TbChevronRight,
+  TbChevronLeft,
   TbVolume,
   TbVolumeOff,
+  TbList,
+  Tb3DCubeSphere,
 } from 'react-icons/tb';

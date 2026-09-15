@@ -15,14 +15,12 @@ const GameRow = ({ game }) => {
       transition={{ duration: 0.55, ease }}
       className="gx-row group flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6"
     >
+      {game.media?.hero && (
+        <div className="gx-row-media" style={{ backgroundImage: `url(${game.media.rowMedia || game.media.hero})` }} />
+      )}
       <span className="gx-row-aurora gx-aurora" aria-hidden="true" />
 
       <div className="gx-row-body flex items-center gap-4 flex-1 min-w-0">
-        {game.media?.hero && (
-          <div className="relative flex-none overflow-hidden rounded-xl" style={{ width: 76, height: 76 }}>
-            <img src={game.media.hero} alt="" className="absolute inset-0 w-full h-full object-cover" />
-          </div>
-        )}
         <div className="flex-1 min-w-0">
           <div className="flex items-baseline gap-3 flex-wrap">
             <h3 className="font-semibold gx-display text-xl sm:text-2xl leading-tight">{game.title}</h3>
@@ -38,12 +36,12 @@ const GameRow = ({ game }) => {
 
       <div className="gx-row-body flex-none flex gap-2">
         {play && (
-          <a href={play} target="_blank" rel="noopener noreferrer" className="gx-btn gx-btn-primary gx-selectable !py-1.5 !px-3.5 !text-sm">
+          <a href={play} target="_blank" rel="noopener noreferrer" className="gx-btn gx-btn-primary gx-selectable !px-3.5 !text-sm !min-h-11">
             <TbPlayerPlay size={15} /> Play
           </a>
         )}
         {repo && (
-          <a href={repo} target="_blank" rel="noopener noreferrer" className="gx-btn gx-selectable !py-1.5 !px-3.5 !text-sm">
+          <a href={repo} target="_blank" rel="noopener noreferrer" className="gx-btn gx-selectable !px-3.5 !text-sm !min-h-11">
             <TbCode size={15} /> Code
           </a>
         )}

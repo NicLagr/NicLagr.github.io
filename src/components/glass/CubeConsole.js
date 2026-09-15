@@ -1,9 +1,8 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import CubeNavigator from './CubeNavigator';
 import { CUBE_PALETTES } from './cubePalettes';
 import * as cubeSettings from './cubeSettings';
-import { renderSection } from './cubeContent';
+import { renderSection, subscribeWorkAssetsReady, preloadWorkThumbnails } from './cubeContent';
 import { profile, projects } from '../../data/portfolio';
 import { games } from '../../data/games';
 import { TbArrowLeft } from './icons';
@@ -13,6 +12,8 @@ import GamePage from './pages/GamePage';
 import AboutPage from './pages/AboutPage';
 import SoundToggle from './SoundToggle';
 import sfx from './sfx';
+
+const CubeNavigator = lazy(() => import('./CubeNavigator'));
 
 // horizontal faces get the darker "turn side" chord, vertical the "turn center"
 const SIDE_FACE = { about: true, contact: true, work: false, play: false };
@@ -79,11 +80,19 @@ const CubeConsole = () => {
     if (activeRef.current) sfx.tick();
   }, [sel]);
 
+  // Work's row thumbnails load async; bump this to force a redraw once one
+  // lands, so a row upgrades from its gradient placeholder to the real photo.
+  const [assetTick, setAssetTick] = useState(0);
+  useEffect(() => {
+    preloadWorkThumbnails();
+    return subscribeWorkAssetsReady(() => setAssetTick((t) => t + 1));
+  }, []);
+
   // cube-menu content only for faces that have one (About dives straight to a page).
   // Re-rendered on selection change so the aurora "row glow" follows the cursor.
   const content = useMemo(
     () => (active && HAS_CUBE_MENU[active] ? renderSection(active, sel, themeStyle) : null),
-    [active, sel, themeStyle]
+    [active, sel, themeStyle, assetTick]
   );
   const contentRef = useRef(content);
   const entryCountRef = useRef(0);
@@ -133,7 +142,10 @@ const CubeConsole = () => {
   useEffect(() => {
     const onKey = (e) => {
       const t = e.target;
-      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+      // let real focusable controls (skip link, sound toggle, back button, résumé
+      // link) handle their own Enter/Space — otherwise this global listener's
+      // preventDefault() swallows native link/button activation
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'A' || t.tagName === 'BUTTON' || t.isContentEditable)) return;
       if (pageRef.current) {
         if (e.key === 'Escape' || e.key === 'Backspace') { e.preventDefault(); back(); }
         return;
@@ -259,23 +271,25 @@ const CubeConsole = () => {
           transition={{ duration: 0.7, ease }}
           style={{ filter: page ? 'blur(2px)' : 'none' }}
         >
-          <CubeNavigator
-            size={size}
-            palette={CUBE_PALETTES[paletteIdx]}
-            motion={motionMode}
-            theme={themeStyle}
-            started={started}
-            onStart={handleStart}
-            activeFace={active}
-            highlight={atRoot ? highlight : null}
-            onNavigate={open}
-            content={content}
-            onHotspot={onHotspot}
-            selectedIndex={sel}
-            onHoverIndex={setSel}
-            onHoverFace={setHighlight}
-            showCaption={false}
-          />
+          <Suspense fallback={<div style={{ width: size, height: size }} />}>
+            <CubeNavigator
+              size={size}
+              palette={CUBE_PALETTES[paletteIdx]}
+              motion={motionMode}
+              theme={themeStyle}
+              started={started}
+              onStart={handleStart}
+              activeFace={active}
+              highlight={atRoot ? highlight : null}
+              onNavigate={open}
+              content={content}
+              onHotspot={onHotspot}
+              selectedIndex={sel}
+              onHoverIndex={setSel}
+              onHoverFace={setHighlight}
+              showCaption={false}
+            />
+          </Suspense>
         </motion.div>
       </div>
 
@@ -332,8 +346,8 @@ const CubeConsole = () => {
                 href={profile.links.resume}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="pointer-events-auto transition-colors hover:text-[var(--ink)]"
-                style={{ color: 'var(--ink-dim)' }}
+                className="pointer-events-auto inline-block transition-colors hover:text-[var(--ink)]"
+                style={{ color: 'var(--ink-dim)', padding: '14px 4px', margin: '-14px -4px' }}
               >
                 Résumé
               </a>

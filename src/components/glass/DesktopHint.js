@@ -41,7 +41,7 @@ const DesktopHint = () => {
             <button
               onClick={dismiss}
               aria-label="Dismiss"
-              className="gx-selectable flex-none grid place-items-center w-7 h-7 rounded-full"
+              className="gx-selectable flex-none grid place-items-center w-11 h-11 rounded-full"
               style={{ color: 'var(--ink-faint)' }}
             >
               <TbX size={15} />
