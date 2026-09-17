@@ -94,6 +94,127 @@ export const experience = [
 // Work projects (games live separately in data/games.js, surfaced in "Play").
 export const projects = [
   {
+    id: 'jewelry-crm',
+    title: 'Jewelry Store CRM',
+    org: 'Independent',
+    year: '2026',
+    role: 'Solo · Design + Full-Stack',
+    summary:
+      'An iPad CRM and repair tracker running in a working jewelry store. Staff move each job across a Kanban board, snap photos of pieces at drop-off, and pull up customers right from the counter.',
+    highlights: [
+      'In daily use at a real store, with the workflow shaped by watching staff use it: a hover-only edit button became permanently visible, and a number input that fought against typing prices became plain text.',
+      'Kanban board from intake to pickup, a single-page ticket flow rebuilt after the owner asked for something simpler than my original wizard, customer directory, and global search.',
+      'Next.js 15 and React 19 in TypeScript, Tailwind v4, and Prisma, with role-based logins.',
+    ],
+    tags: ['Next.js', 'React', 'TypeScript', 'Tailwind', 'Prisma'],
+    image: getImagePath('/projects/jewelry-crm/repair-board.png'),
+    accent: 'var(--accent-grad)',
+    caseStudy: {
+      sections: [
+        {
+          heading: 'The problem',
+          body: 'A local jewelry store was running repairs and customers on paper and memory. A piece comes in for repair and it needs a ticket, a photo, a customer attached to it, and a clear place in the queue from drop-off to pickup. That is easy to lose track of on a busy counter. They needed something a staff member could actually use mid-conversation with a customer, on an iPad, without slowing the interaction down.',
+          image: {
+            src: getImagePath('/projects/jewelry-crm/paper-ticket-redacted.jpg'),
+            caption: 'An actual repair ticket from the store, before this project. Handwritten, no photo, no searchable record (customer name redacted)',
+            maxWidth: 320,
+          },
+        },
+        {
+          heading: 'Scoping with the owner',
+          body: 'The store is run by my family, so I could sit down with the owner directly and scope this properly before opening Figma. I wrote out the roles who’d use it (associate, jeweler, manager), the full status pipeline from intake to picked up, the data behind a job, and a plain list of what I would not build yet: a payment gateway, a customer portal, real analytics. Cutting that early kept the first version to what the counter actually needed.',
+        },
+        {
+          heading: 'A wizard, then one page',
+          body: [
+            'My first wireframe split ticket creation into four steps: customer, then item, then services, then a promised date. The owner’s feedback was direct. He wanted one page, not four screens, since staff at the counter don’t have time to click through steps. I checked two things before rebuilding it, one page instead of four and landscape instead of portrait, since the iPad sits flat on the counter. Both confirmed, so intake became a single scrolling form.',
+            'He also asked for the job number to be entered manually instead of auto-generated. Their paper tickets already have their own numbers on them, and two different numbering systems on the same job would confuse the counter more than it helped. The final field still auto-generates a number if you leave it blank, but typing in their existing one is the default path.',
+          ],
+          images: [
+            {
+              src: getImagePath('/projects/jewelry-crm/process-wireframe-wizard.jpg'),
+              caption: 'Before: a four-step wizard',
+            },
+            {
+              src: getImagePath('/projects/jewelry-crm/figma-intake.png'),
+              caption: 'After: one scrolling page',
+            },
+          ],
+          image: {
+            src: getImagePath('/projects/jewelry-crm/intake-flow.png'),
+            caption: 'The single-page intake as it shipped, with the job number entered manually to match their existing paper tickets',
+          },
+        },
+        {
+          heading: 'What I built',
+          body: 'I designed and built the whole thing myself, front to back. It is a CRM and repair tracker built around a Kanban board: every job moves across columns from intake to pickup, so anyone can see the state of the shop at a glance. Creating a ticket is one page, you snap photos of the piece at drop-off, attach a customer, and it lands on the board. There is a customer directory and a global search so staff can pull someone up right from the counter.',
+          images: [
+            {
+              src: getImagePath('/projects/jewelry-crm/repair-board.png'),
+              caption: 'The repair board, tracking each job from intake to pickup',
+            },
+            {
+              src: getImagePath('/projects/jewelry-crm/customer-directory.png'),
+              caption: 'The customer directory, searchable from the counter',
+            },
+          ],
+        },
+        {
+          heading: 'Design and stack',
+          body: 'I designed it iPad-first, since that is where it lives, on a counter with a customer standing in front of it. Under the hood it is Next.js 15 and React 19 in TypeScript, Tailwind v4 for the interface, and Prisma for the data, with role-based logins so staff and owner each see the right things. I owned the UX, the interface, the data model, and the backend.',
+        },
+        {
+          heading: 'What iPad-first actually meant',
+          body: [
+            'The Figma prototype shaped the direction, but the shipped product kept moving well past it. Once real hands were on the screen in the store, rapid AI-assisted iteration and actual daily use, not just a usability session, kept surfacing small friction I hadn’t predicted.',
+            'The job number’s edit button only appeared on hover, fine with a mouse, invisible on a touchscreen with no hover state. Watching staff hunt for it, I made every edit button permanently visible. The price field started as a number input with spinner arrows that reformatted the value on every keystroke, so typing a price felt like fighting the field. I replaced it with a plain text input that only reformats once you tap away, so it types the way someone actually types a price.',
+          ],
+          image: {
+            src: getImagePath('/projects/jewelry-crm/process-job-detail-edit.jpg'),
+            caption: 'The shipped job detail: every edit button permanently visible, no hover state to hunt for',
+          },
+        },
+        {
+          heading: 'Texting customers without guessing',
+          body: 'Status updates can also trigger a text. Staff open a job, pick a template (received, ready for pickup) or write their own, and send it, Twilio handles delivery from there. It checks the customer’s opt-in, a store-wide SMS toggle in settings, and logs every attempt, sent, blocked, or failed, to that job’s activity trail, so there is always a record of what a customer was told and when.',
+          image: {
+            src: getImagePath('/projects/jewelry-crm/process-sms-modal.jpg'),
+            caption: 'The send-text modal: pick a template, edit it, send it',
+          },
+        },
+        {
+          heading: 'A promise date that wasn’t always a promise',
+          body: [
+            'The promised pickup date started out required, which made sense until a piece needed assessment before anyone could promise a turnaround, and staff were stuck entering a placeholder date just to get past the form. The owner asked me to fix it, so I made it optional. The first pass just dropped the requirement without saying it was optional, so I added an explicit "(optional)" label, a way to clear the date, and a plain sentence on when it shows up in a customer text, replacing an amber warning box.',
+            'The completed-ticket label went through its own loop. A finished ticket first showed just the completion date, but staff also needed to see it against the original promise, so I added that back in parentheses. The first version read "Completed: [date] (was [date])," and "was" read as ambiguous enough that I changed it to "Promised."',
+          ],
+          image: {
+            src: getImagePath('/projects/jewelry-crm/process-promised-date.jpg'),
+            caption: 'Optional, clearable, and plain about where the date goes: shown to the customer in SMS notifications',
+          },
+        },
+        {
+          heading: 'In daily use',
+          body: 'This runs in a real store, and it didn’t stay static after launch. The Kanban board shipped first with a note saying drag-and-drop wasn’t implemented yet, click a card to change its status. Once the core flow was proven, I added real drag-and-drop. Search had a similar arc: results first got squeezed into the same four-column layout, confusing to scan, so I gave search its own flat list view. None of these were big rewrites, they were the kind of small correction you only find by watching someone use the thing every day.',
+          images: [
+            {
+              src: getImagePath('/projects/jewelry-crm/kanban-drag-drop.gif'),
+              caption: 'Real drag-and-drop, added once the click-to-change-status version had already proven the flow',
+            },
+            {
+              src: getImagePath('/projects/jewelry-crm/figma-reports.png'),
+              caption: 'A reports and analytics view from the Figma design, planned beyond the current build',
+            },
+          ],
+        },
+      ],
+      figmaEmbed:
+        'https://www.figma.com/embed?embed_host=share&url=https%3A%2F%2Fwww.figma.com%2Fproto%2FhCZGwMAKQABnoMgIh4LDDV%2FJewelry-CRM-Prototype%3Fnode-id%3D138-389%26starting-point-node-id%3D138%253A389%26t%3D6oBdWu1ihwyIhbz2-1%26hide-ui%3D1%26scaling%3Dscale-down-width',
+      figmaEmbedLink: 'https://www.figma.com/proto/hCZGwMAKQABnoMgIh4LDDV/Jewelry-CRM-Prototype?node-id=138-389&starting-point-node-id=138%3A389',
+    },
+    links: { repo: 'https://github.com/NicLagr/Jewelry-RCM-App' },
+  },
+  {
     id: 'weather-viz',
     title: 'Weather & Flight Visualization Platform',
     org: 'GE Aerospace · Aerospace Carbon Solutions',
@@ -270,77 +391,6 @@ export const projects = [
     },
     links: {},
     featured: true,
-  },
-  {
-    id: 'jewelry-crm',
-    title: 'Jewelry Store CRM',
-    org: 'Independent',
-    year: '2026',
-    role: 'Solo · Design + Full-Stack',
-    summary:
-      'An iPad CRM and repair tracker running in a working jewelry store. Staff move each job across a Kanban board, snap photos of pieces at drop-off, and pull up customers right from the counter.',
-    highlights: [
-      'In daily use at a real store, with the workflow shaped by watching staff use it: a hover-only edit button became permanently visible, and a number input that fought against typing prices became plain text.',
-      'Kanban board from intake to pickup, a quick multi-step ticket flow, customer directory, and global search.',
-      'Next.js 15 and React 19 in TypeScript, Tailwind v4, and Prisma, with role-based logins.',
-    ],
-    tags: ['Next.js', 'React', 'TypeScript', 'Tailwind', 'Prisma'],
-    image: getImagePath('/projects/jewelry-crm/repair-board.png'),
-    accent: 'var(--accent-grad)',
-    caseStudy: {
-      sections: [
-        {
-          heading: 'The problem',
-          body: 'A local jewelry store was running repairs and customers on paper and memory. A piece comes in for repair and it needs a ticket, a photo, a customer attached to it, and a clear place in the queue from drop-off to pickup. That is easy to lose track of on a busy counter. They needed something a staff member could actually use mid-conversation with a customer, on an iPad, without slowing the interaction down.',
-        },
-        {
-          heading: 'What I built',
-          body: 'I designed and built the whole thing myself, front to back. It is a CRM and repair tracker built around a Kanban board: every job moves across columns from intake to pickup, so anyone can see the state of the shop at a glance. Creating a ticket is a short multi-step flow, you snap photos of the piece at drop-off, attach a customer, and it lands on the board. There is a customer directory and a global search so staff can pull someone up right from the counter.',
-        },
-        {
-          heading: 'Design and stack',
-          body: 'I designed it iPad-first, since that is where it lives, on a counter with a customer standing in front of it. Under the hood it is Next.js 15 and React 19 in TypeScript, Tailwind v4 for the interface, and Prisma for the data, with role-based logins so staff and owner each see the right things. I owned the UX, the interface, the data model, and the backend.',
-        },
-        {
-          heading: 'What iPad-first actually meant',
-          body: 'Some of what that meant only became obvious once real hands were on the screen. The job number’s edit button only appeared on hover, fine with a mouse, invisible on a touchscreen with no hover state. Watching staff hunt for it, I made it permanently visible. The price field started as a number input with spinner arrows that reformatted the value on every keystroke, so typing a price felt like fighting the field. I replaced it with a plain text input that only reformats once you tap away, so it types the way someone actually types a price.',
-        },
-        {
-          heading: 'A promise date that wasn’t always a promise',
-          body: [
-            'The promised pickup date started out required, which made sense until a piece needed assessment before anyone could promise a turnaround, and staff were stuck entering a placeholder date just to get past the form. The owner asked me to fix it, so I made it optional. The first pass just dropped the requirement without saying it was optional, so I added an explicit "(optional)" label, a way to clear the date, and a plain sentence on when it shows up in a customer text, replacing an amber warning box.',
-            'The completed-ticket label went through its own loop. A finished ticket first showed just the completion date, but staff also needed to see it against the original promise, so I added that back in parentheses. The first version read "Completed: [date] (was [date])," and "was" read as ambiguous enough that I changed it to "Promised."',
-          ],
-        },
-        {
-          heading: 'In daily use',
-          body: 'This runs in a real store, and it didn’t stay static after launch. The Kanban board shipped first with a note saying drag-and-drop wasn’t implemented yet, click a card to change its status. Once the core flow was proven, I added real drag-and-drop. Search had a similar arc: results first got squeezed into the same four-column layout, confusing to scan, so I gave search its own flat list view. None of these were big rewrites, they were the kind of small correction you only find by watching someone use the thing every day.',
-        },
-      ],
-      gallery: [
-        {
-          src: getImagePath('/projects/jewelry-crm/repair-board.png'),
-          caption: 'The repair board, tracking each job from intake to pickup',
-        },
-        {
-          src: getImagePath('/projects/jewelry-crm/intake-flow.png'),
-          caption: 'The multi-step flow for logging a new repair at drop-off',
-        },
-        {
-          src: getImagePath('/projects/jewelry-crm/customer-directory.png'),
-          caption: 'The customer directory, searchable from the counter',
-        },
-        {
-          src: getImagePath('/projects/jewelry-crm/figma-intake.png'),
-          caption: 'The intake screen from the Figma design, with a line-item service builder and quick promised-date presets',
-        },
-        {
-          src: getImagePath('/projects/jewelry-crm/figma-reports.png'),
-          caption: 'A reports and analytics view from the Figma design, planned beyond the current build',
-        },
-      ],
-    },
-    links: { repo: 'https://github.com/NicLagr/Jewelry-RCM-App' },
   },
   {
     id: 'tec-demos',

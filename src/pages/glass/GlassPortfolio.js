@@ -181,6 +181,10 @@ const GlassPortfolio = ({ accessibleMode = false, onAccessibleModeChange }) => {
       if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
       const t = e.target;
       if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+      // a modal (project sheet, lightbox, ...) owns arrow keys while it's open —
+      // stepSection() itself no-ops here too, but bailing before preventDefault
+      // lets whatever's actually open handle the keypress cleanly
+      if (document.body.style.overflow === 'hidden') return;
       e.preventDefault();
       stepSection(e.key === 'ArrowRight' ? 1 : -1);
     };
