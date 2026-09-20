@@ -139,45 +139,62 @@ const ProjectPage = ({ project, onOpenCaseStudy }) => {
 
   return (
     <PageShell title={project.title}>
-      <motion.div
-        ref={heroRef}
-        variants={pageFadeUp}
-        className="relative mb-10 grid place-items-center"
-        style={{ borderRadius: 24, background: liveCube ? 'transparent' : project.accent, aspectRatio: '16 / 8', overflow: liveCube ? 'visible' : 'hidden' }}
-      >
-        {liveCube ? (
-          <Suspense fallback={null}>
-            <CubeNavigator
-              size={shownCubeSize}
-              showCaption={false}
-              palette={CUBE_PALETTES[paletteIdx]}
-              motion={motionMode}
-              theme={themeStyle}
-              faces={SETTINGS_FACES}
-              activeFace={activeSetting}
-              onNavigate={(id) => { if (sfx.open) sfx.open(); setActiveSetting(id); }}
-              onHoverFace={(id) => { if (id && sfx.aim) sfx.aim(); }}
-              content={settingsContent}
-              onHotspot={onHotspot}
-              selectedIndex={sel}
-              onHoverIndex={setSel}
-            />
-          </Suspense>
-        ) : (
-          <>
-            {project.image && (
-              <img
-                src={project.image}
-                alt={project.title}
-                className="absolute inset-0 w-full h-full object-cover"
-                onError={(e) => { e.currentTarget.style.display = 'none'; }}
+      {project.image && project.imageFit === 'contain' ? (
+        <motion.img
+          ref={heroRef}
+          variants={pageFadeUp}
+          src={project.image}
+          alt={project.title}
+          className="w-full h-auto block mb-10"
+          style={{ borderRadius: 24 }}
+          onError={(e) => { e.currentTarget.style.display = 'none'; }}
+        />
+      ) : (
+        <motion.div
+          ref={heroRef}
+          variants={pageFadeUp}
+          className="relative mb-10 grid place-items-center"
+          style={{
+            borderRadius: 24,
+            background: liveCube ? 'transparent' : project.accent,
+            aspectRatio: '16 / 8',
+            overflow: liveCube ? 'visible' : 'hidden',
+          }}
+        >
+          {liveCube ? (
+            <Suspense fallback={null}>
+              <CubeNavigator
+                size={shownCubeSize}
+                showCaption={false}
+                palette={CUBE_PALETTES[paletteIdx]}
+                motion={motionMode}
+                theme={themeStyle}
+                faces={SETTINGS_FACES}
+                activeFace={activeSetting}
+                onNavigate={(id) => { if (sfx.open) sfx.open(); setActiveSetting(id); }}
+                onHoverFace={(id) => { if (id && sfx.aim) sfx.aim(); }}
+                content={settingsContent}
+                onHotspot={onHotspot}
+                selectedIndex={sel}
+                onHoverIndex={setSel}
               />
-            )}
-            {!project.image && <ProjectVisual project={project} webglReady={cubeReady} />}
-            <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(3,4,10,0.05), rgba(3,4,10,0.55))' }} />
-          </>
-        )}
-      </motion.div>
+            </Suspense>
+          ) : (
+            <>
+              {project.image && (
+                <img
+                  src={project.image}
+                  alt={project.title}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                />
+              )}
+              {!project.image && <ProjectVisual project={project} webglReady={cubeReady} />}
+              <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(3,4,10,0.05), rgba(3,4,10,0.55))' }} />
+            </>
+          )}
+        </motion.div>
+      )}
 
       {liveCube && !activeSetting && (
         <motion.div variants={pageFadeUp} className="-mt-2 mb-10 flex justify-center">

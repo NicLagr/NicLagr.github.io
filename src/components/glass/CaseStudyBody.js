@@ -1,8 +1,9 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import ProjectVisual, { canWebGL, VisualCaption } from './ProjectVisual';
-import { TbX, TbChevronLeft, TbChevronRight, TbExternalLink } from './icons';
+import { TbX, TbChevronLeft, TbChevronRight, TbExternalLink, TbVolume, TbVolumeOff } from './icons';
+import MediaBadge from './MediaBadge';
 
 const ease = [0.2, 0.9, 0.25, 1];
 
@@ -34,6 +35,7 @@ function collectImages(cs) {
   const list = [];
   (cs.sections || []).forEach((s) => {
     if (s.images) s.images.forEach((im) => list.push(im));
+    if (s.carousel) s.carousel.forEach((im) => list.push(im));
     if (s.image) list.push(s.image);
   });
   (cs.gallery || []).forEach((g) => list.push(g));
@@ -58,13 +60,345 @@ const CaseImage = ({ image, index, onOpen }) => (
         onError={hideFigure}
       />
     </button>
-    {image.caption && (
+    {(image.caption || image.badge) && (
       <figcaption className="mt-2 text-sm leading-relaxed" style={{ color: 'var(--ink-dim)' }}>
+        <MediaBadge badge={image.badge} />
         {image.caption}
       </figcaption>
     )}
   </figure>
 );
+
+const CAROUSEL_CARD_W = 220;
+const VIDEO_CARD_W = 320;
+const CAROUSEL_COPIES = 3;
+
+// Shared scroll/loop mechanics behind every focused carousel on this page:
+// the centered item reads at full size, neighbors shrink and fade, and it
+// loops seamlessly in both directions. Three full copies of the item list
+// sit side by side in the DOM (domIndex = copy*n + i, copy in [0,1,2]), not
+// just one "peek" card per end, so a continuous drag or fling never runs out
+// of physical content to scroll into — there's no boundary to hit a dead
+// zone against. The middle copy (domIndex n..2n-1) is home. A scroll
+// listener watches which copy the centered card belongs to and, the instant
+// it drifts into the leading or trailing copy, shifts `scrollLeft` back by
+// exactly one copy-width in the same tick with no transition; since every
+// copy is pixel-identical, that correction is invisible, and it happens
+// continuously during the scroll rather than only once motion settles, so
+// momentum carries through the "seam" the same way it does anywhere else.
+// Every card in every copy must use `scroll-snap-align`, which is what makes
+// the correction possible: `scroll-snap-type: mandatory` will always
+// resettle on a real target we just moved to, never fight it back to a
+// non-target position (that fight is exactly what broke the single-peek-
+// clone version of this before three copies replaced it). Not the CSS
+// `::scroll-marker`/`::scroll-button` proposal (Chrome-only, unshippable) —
+// same visual result, works in every browser.
+function useLoopCarousel(n) {
+  const trackRef = useRef(null);
+  const setWidthRef = useRef(0);
+  const [activeDom, setActiveDom] = useState(0);
+  const total = n * CAROUSEL_COPIES;
+  const active = ((activeDom % n) + n) % n;
+
+  const centerOn = (child, behavior) => {
+    const el = trackRef.current;
+    if (!el || !child) return;
+    const left = child.offsetLeft - (el.clientWidth - child.clientWidth) / 2;
+    if (behavior === 'smooth') el.scrollTo({ left, behavior });
+    else el.scrollLeft = left;
+  };
+
+  // land on the home copy's first card before the first paint, and measure
+  // the pixel width of one full copy (the distance from the home copy's
+  // first card to the leading copy's first card) — used every scroll tick
+  // to detect and correct for having drifted a whole copy off-center.
+  useLayoutEffect(() => {
+    const el = trackRef.current;
+    if (!el) return;
+    setWidthRef.current = el.children[n].offsetLeft - el.children[0].offsetLeft;
+    centerOn(el.children[n], 'instant');
+    setActiveDom(n);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [n]);
+
+  useEffect(() => {
+    const el = trackRef.current;
+    if (!el) return undefined;
+    let raf = 0;
+    const update = () => {
+      const rect = el.getBoundingClientRect();
+      const mid = rect.left + rect.width / 2;
+      let best = 0;
+      let bestDist = Infinity;
+      for (let d = 0; d < total; d++) {
+        const child = el.children[d];
+        if (!child) continue;
+        const r = child.getBoundingClientRect();
+        const dist = Math.abs(r.left + r.width / 2 - mid);
+        if (dist < bestDist) { bestDist = dist; best = d; }
+      }
+      const setW = setWidthRef.current;
+      if (setW > 0) {
+        if (best < n) { el.scrollLeft += setW; best += n; }
+        else if (best >= 2 * n) { el.scrollLeft -= setW; best -= n; }
+      }
+      setActiveDom(best);
+    };
+    const onScroll = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(update); };
+    update();
+    el.addEventListener('scroll', onScroll, { passive: true });
+    return () => { el.removeEventListener('scroll', onScroll); cancelAnimationFrame(raf); };
+  }, [n, total]);
+
+  const goToDom = (domIndex) => centerOn(trackRef.current?.children[domIndex], 'smooth');
+  const stepPrev = () => goToDom(activeDom - 1);
+  const stepNext = () => goToDom(activeDom + 1);
+  const goToLogical = (i) => goToDom(n + i); // always via the home copy
+
+  return { trackRef, activeDom, active, goToDom, stepPrev, stepNext, goToLogical };
+}
+
+// Prev/Next + dot markers, shared chrome around whatever `renderCard` draws —
+// the image carousel and the video carousel differ only in the card itself
+// (a static thumbnail that opens a lightbox, vs. a card that plays video and
+// carries a mute toggle), not in the loop/step/dot mechanics.
+const CarouselChrome = ({ n, cardW, activeCaption, activeBadge, active, stepPrev, stepNext, goToLogical, trackRef, renderCard }) => {
+  const cards = [];
+  for (let copy = 0; copy < CAROUSEL_COPIES; copy++) {
+    for (let i = 0; i < n; i++) cards.push({ i, domIndex: copy * n + i });
+  }
+  return (
+    <div className="relative mt-5">
+      <div
+        ref={trackRef}
+        className="flex gap-4 overflow-x-auto gx-noscroll"
+        style={{ scrollSnapType: 'x mandatory', paddingInline: `calc(50% - ${cardW / 2}px)`, paddingBlock: 12 }}
+      >
+        {cards.map(({ i, domIndex }) => renderCard(i, domIndex))}
+      </div>
+
+      <button
+        onClick={stepPrev}
+        aria-label="Previous"
+        className="!absolute left-2 top-1/2 -translate-y-1/2 gx-glass rounded-full w-9 h-9 grid place-items-center z-10 hidden sm:grid"
+      >
+        <TbChevronLeft size={16} />
+      </button>
+      <button
+        onClick={stepNext}
+        aria-label="Next"
+        className="!absolute right-2 top-1/2 -translate-y-1/2 gx-glass rounded-full w-9 h-9 grid place-items-center z-10 hidden sm:grid"
+      >
+        <TbChevronRight size={16} />
+      </button>
+
+      {(activeCaption || activeBadge) && (
+        <p className="text-center text-sm mt-3" style={{ color: 'var(--ink)' }}>
+          <MediaBadge badge={activeBadge} />
+          {activeCaption}
+        </p>
+      )}
+
+      <div className="flex items-center justify-center gap-2 mt-2">
+        {Array.from({ length: n }).map((_, i) => (
+          <button
+            key={i}
+            onClick={() => goToLogical(i)}
+            aria-label={`Go to slide ${i + 1}`}
+            className="rounded-full"
+            style={{
+              width: i === active ? 8 : 6,
+              height: i === active ? 8 : 6,
+              background: i === active ? 'var(--accent)' : 'var(--glass-edge)',
+              transition: 'all 200ms ease',
+            }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// Defined at module scope deliberately, not inside `Carousel`'s render body —
+// an inline component definition gets a fresh function identity every render,
+// which makes React treat it as a different component type and unmount/
+// remount the whole subtree (every `<img>` in it) on every state change
+// instead of just re-rendering. Harmless for these still images beyond some
+// wasted work, but the same mistake in `VideoCarouselCard` below is what
+// silently broke the video/audio, so both are hoisted out on principle.
+const CarouselImageCard = ({ im, i, domIndex, isActive, onOpen, startIndex, goToDom }) => (
+  <button
+    onClick={() => (isActive ? onOpen(startIndex + i) : goToDom(domIndex))}
+    className="flex-none gx-selectable"
+    style={{
+      scrollSnapAlign: 'center',
+      width: CAROUSEL_CARD_W,
+      transform: isActive ? 'scale(1)' : 'scale(0.8)',
+      opacity: isActive ? 1 : 0.4,
+      transition: 'transform 350ms ease, opacity 350ms ease',
+    }}
+  >
+    <div
+      className="relative overflow-hidden"
+      style={{
+        borderRadius: 16,
+        background: '#05060e',
+        border: '1px solid var(--glass-edge-soft)',
+        aspectRatio: '1080 / 1240',
+        boxShadow: isActive ? '0 20px 45px -12px rgba(0,0,0,0.55)' : 'none',
+      }}
+    >
+      <img
+        src={im.src}
+        alt={im.caption || ''}
+        loading="lazy"
+        className="absolute inset-0 w-full h-full object-cover"
+        onError={hideTile}
+      />
+    </div>
+  </button>
+);
+
+const Carousel = ({ items, startIndex, onOpen }) => {
+  const n = items.length;
+  const { trackRef, activeDom, active, goToDom, stepPrev, stepNext, goToLogical } = useLoopCarousel(n);
+
+  return (
+    <CarouselChrome
+      n={n}
+      cardW={CAROUSEL_CARD_W}
+      activeCaption={items[active]?.caption}
+      activeBadge={items[active]?.badge}
+      active={active}
+      stepPrev={stepPrev}
+      stepNext={stepNext}
+      goToLogical={goToLogical}
+      trackRef={trackRef}
+      renderCard={(i, domIndex) => (
+        <CarouselImageCard
+          key={domIndex}
+          im={items[i]}
+          i={i}
+          domIndex={domIndex}
+          isActive={domIndex === activeDom}
+          onOpen={onOpen}
+          startIndex={startIndex}
+          goToDom={goToDom}
+        />
+      )}
+    />
+  );
+};
+
+// A focused carousel for real device clips: only the centered card ever
+// plays video, everything else — every other logical item, and every copy
+// in the leading/trailing loop buffer — shows a static poster frame. Three
+// videos autoplaying side by side (the original layout here) was too much
+// at once; this keeps exactly one playing, same as the still-image carousel
+// keeps exactly one in focus. The speaker button only shows up on a clip
+// that's marked `hasAudio` (the radio one, the only clip actually recorded
+// with meaningful sound) — no dead mute button on clips that couldn't do
+// anything if you tapped it. Even that one starts muted; sound is something
+// you opt into, never something that starts playing at you. Switching to a
+// different card always re-mutes, so audio never silently carries over onto
+// whatever you look at next.
+// Hoisted for the same reason as `CarouselImageCard`: an inline definition
+// would get a new identity — and force React to unmount/remount its
+// `<video>` — on every render of `VideoCarousel`, which includes every time
+// `muted` changes. That was the actual bug behind "the sound doesn't work":
+// clicking the speaker button re-rendered with a *different* inline `Card`
+// function, React tore down the playing video and mounted a brand new one to
+// replace it, and the fresh element's autoplay-with-sound got silently
+// blocked by the browser despite the click being a real user gesture, since
+// as far as the browser could tell a new, unrelated media element had just
+// asked to play audio out of nowhere. A stable component reference means the
+// existing `<video>` DOM node just gets its `muted` property flipped in
+// place, the same element, same playback, same gesture — which browsers do
+// allow.
+const VideoCarouselCard = ({ im, isActive, muted, onToggleMute, domIndex, goToDom }) => (
+  <div
+    role="button"
+    tabIndex={0}
+    onClick={() => !isActive && goToDom(domIndex)}
+    onKeyDown={(e) => { if (!isActive && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); goToDom(domIndex); } }}
+    className={isActive ? 'flex-none' : 'flex-none gx-selectable'}
+    style={{
+      scrollSnapAlign: 'center',
+      width: VIDEO_CARD_W,
+      cursor: isActive ? 'default' : 'pointer',
+      transform: isActive ? 'scale(1)' : 'scale(0.8)',
+      opacity: isActive ? 1 : 0.4,
+      transition: 'transform 350ms ease, opacity 350ms ease',
+    }}
+  >
+    <div
+      className="relative overflow-hidden"
+      style={{
+        borderRadius: 16,
+        background: '#05060e',
+        border: '1px solid var(--glass-edge-soft)',
+        aspectRatio: '9 / 16',
+        boxShadow: isActive ? '0 20px 45px -12px rgba(0,0,0,0.55)' : 'none',
+      }}
+    >
+      {isActive ? (
+        <video
+          src={im.src}
+          autoPlay
+          muted={muted}
+          loop
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+          onError={hideTile}
+        />
+      ) : (
+        <img src={im.poster} alt="" className="absolute inset-0 w-full h-full object-cover" />
+      )}
+      {isActive && im.hasAudio && (
+        <button
+          onClick={(e) => { e.stopPropagation(); onToggleMute(); }}
+          aria-label={muted ? 'Unmute' : 'Mute'}
+          className="!absolute bottom-3 right-3 gx-glass rounded-full w-9 h-9 grid place-items-center z-10"
+        >
+          {muted ? <TbVolumeOff size={16} /> : <TbVolume size={16} />}
+        </button>
+      )}
+    </div>
+  </div>
+);
+
+const VideoCarousel = ({ items }) => {
+  const n = items.length;
+  const { trackRef, activeDom, active, stepPrev, stepNext, goToLogical, goToDom } = useLoopCarousel(n);
+  const [muted, setMuted] = useState(true);
+
+  useEffect(() => { setMuted(true); }, [active]);
+
+  return (
+    <CarouselChrome
+      n={n}
+      cardW={VIDEO_CARD_W}
+      activeCaption={items[active]?.caption}
+      activeBadge={items[active]?.badge}
+      active={active}
+      stepPrev={stepPrev}
+      stepNext={stepNext}
+      goToLogical={goToLogical}
+      trackRef={trackRef}
+      renderCard={(i, domIndex) => (
+        <VideoCarouselCard
+          key={domIndex}
+          im={items[i]}
+          domIndex={domIndex}
+          isActive={domIndex === activeDom}
+          muted={muted}
+          onToggleMute={() => setMuted((m) => !m)}
+          goToDom={goToDom}
+        />
+      )}
+    />
+  );
+};
 
 // Doesn't set the iframe's `src` until it actually scrolls into view. Figma's
 // embed pulls keyboard focus into itself once it finishes loading (breaking
@@ -145,7 +479,23 @@ const CaseStudyBody = ({ project, showHero = true, showMeta = true }) => {
 
   return (
     <>
-      {showHero && (cs.hero || showVisual) && (
+      {/* A product shot (imageFit: 'contain') gets no forced aspect ratio, no
+          accent-color background, and no darkening overlay — those all exist
+          to make a cropped, letterboxed hero read cleanly, and a shot that's
+          already a clean, fully-visible image needs none of it. Forcing one
+          into that box either crops it (`cover`) or exposes the accent
+          background as visible bars around it (`contain`); showing it at its
+          own natural size sidesteps the mismatch instead of fighting it. */}
+      {showHero && cs.hero && project.imageFit === 'contain' && (
+        <img
+          src={cs.hero}
+          alt={`${project.title} — main view`}
+          className="w-full h-auto block mb-10"
+          style={{ borderRadius: 20, boxShadow: '0 24px 60px -20px rgba(0,0,0,0.5)' }}
+          onError={hideImg}
+        />
+      )}
+      {showHero && (cs.hero || showVisual) && project.imageFit !== 'contain' && (
         <div
           className="relative overflow-hidden mb-10"
           style={{ borderRadius: 20, background: project.accent, aspectRatio: '16 / 9' }}
@@ -170,6 +520,8 @@ const CaseStudyBody = ({ project, showHero = true, showMeta = true }) => {
         {cs.sections.map((s, i) => {
           const pairStart = imgCursor;
           if (s.images) imgCursor += s.images.length;
+          const carouselStart = imgCursor;
+          if (s.carousel) imgCursor += s.carousel.length;
           const singleIdx = s.image ? imgCursor++ : null;
           return (
             <section key={i}>
@@ -193,6 +545,8 @@ const CaseStudyBody = ({ project, showHero = true, showMeta = true }) => {
                   ))}
                 </div>
               )}
+              {s.carousel && <Carousel items={s.carousel} startIndex={carouselStart} onOpen={setLightbox} />}
+              {s.videos && <VideoCarousel items={s.videos} />}
               {s.image && <CaseImage image={s.image} index={singleIdx} onOpen={setLightbox} />}
             </section>
           );
@@ -316,8 +670,9 @@ const CaseStudyBody = ({ project, showHero = true, showMeta = true }) => {
                 className="block"
                 style={{ borderRadius: 16, maxWidth: '90vw', maxHeight: '75vh', objectFit: 'contain' }}
               />
-              {images[lightbox].caption && (
+              {(images[lightbox].caption || images[lightbox].badge) && (
                 <p className="mt-4 text-sm leading-relaxed text-center" style={{ color: 'var(--ink-dim)', maxWidth: 640 }}>
+                  <MediaBadge badge={images[lightbox].badge} />
                   {images[lightbox].caption}
                 </p>
               )}

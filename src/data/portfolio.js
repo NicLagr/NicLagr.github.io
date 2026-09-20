@@ -107,9 +107,13 @@ export const projects = [
       'Next.js 15 and React 19 in TypeScript, Tailwind v4, and Prisma, with role-based logins.',
     ],
     tags: ['Next.js', 'React', 'TypeScript', 'Tailwind', 'Prisma'],
-    image: getImagePath('/projects/jewelry-crm/repair-board.png'),
+    // A Figma mockup of the job board composited into a photorealistic
+    // iPad-on-a-desk shot — how the product actually reads sitting on the
+    // counter, not just as a screenshot.
+    image: getImagePath('/projects/jewelry-crm/iPad Pro mockup.png'),
     accent: 'var(--accent-grad)',
     caseStudy: {
+      hero: getImagePath('/projects/jewelry-crm/iPad Pro mockup.png'),
       sections: [
         {
           heading: 'The problem',
@@ -213,6 +217,218 @@ export const projects = [
       figmaEmbedLink: 'https://www.figma.com/proto/hCZGwMAKQABnoMgIh4LDDV/Jewelry-CRM-Prototype?node-id=138-389&starting-point-node-id=138%3A389',
     },
     links: { repo: 'https://github.com/NicLagr/Jewelry-RCM-App' },
+  },
+  {
+    id: 'newvegas',
+    title: 'New Vegas Web Monitor',
+    org: 'Personal',
+    year: '2026',
+    role: 'Solo · Design + Engineering',
+    summary:
+      'A Pip-Boy-style second screen for Fallout: New Vegas. A native game plugin streams live player state to a web app over WebSocket, so you can read status, inventory, and the Mojave map on a second display while you play.',
+    highlights: [
+      'Ran a full design process before writing any code: a navigation flow map, low-fidelity wireframes with a running decisions log, a Figma design system (color, type, and spacing tokens, 15+ components), and every final screen, referenced through development rather than designed on the fly.',
+      'Designed status as the default view, since HP and AP are what you check first mid-fight, with every screen auto-updating over WebSocket so it works as a glance, not an app you operate.',
+      'Built a peripheral combat indicator, a soft glow at the screen edges when you’re in a fight, since your eyes are on the game, not this screen.',
+      'Redesigned marker placement after the first version (long-press) fought with the map’s own pan gesture; replaced it with a fixed reticle you aim by panning underneath it.',
+    ],
+    tags: ['UX Design', 'Vue 3', 'TypeScript', 'C++', 'WebSocket', 'PWA', 'Capacitor'],
+    // A custom-built device mockup (real vector illustration, not a stock
+    // template: bezel, hinge, glass glare, every button, all built in Figma)
+    // showing both screens at once reads as an actual shipped product, not
+    // just a UI crop — a stronger first impression than a bare screenshot.
+    // Card-shaped contexts (Work row, project hero, sheet header) cover-crop
+    // this the same as any other project image; the shot is generously
+    // padded and centered, so a center-crop still shows the whole device.
+    image: getImagePath('/projects/newvegas/device-mockup-full.png'),
+    // `imageFit: 'contain'` only changes how the *case study* hero renders
+    // (see CaseStudyBody) — that one has no fixed card shape to match, so it
+    // shows the product shot at its own natural size instead of forcing it
+    // into a box it doesn't fit, which is what caused visible letterbox bars.
+    imageFit: 'contain',
+    accent: 'var(--accent-grad)',
+    caseStudy: {
+      // the array shot (all three color options together) for the case
+      // study specifically, since it ties directly to the "amber, green,
+      // blue" theme story later in the page
+      hero: getImagePath('/projects/newvegas/device-mockup-array.png'),
+      sections: [
+        {
+          heading: 'What a Pip-Boy is',
+          body: 'The Pip-Boy is the wrist computer every playable character wears in the Fallout series. It holds your stats, inventory, map, and radio, and it is one of the more recognizable pieces of interface design in games, a HUD that is actually an object your character is wearing instead of a floating overlay. New Vegas Web Monitor takes that object out of the game and puts it on a second screen. You play Fallout: New Vegas on your main display, and your phone or a second monitor becomes a live Pip-Boy, status, inventory, and the Mojave map, updating as you actually play. I built it for dual-screen Android handhelds specifically, where there is a second panel sitting a few inches from the game doing nothing. I also ran the project the way I would want to run a real design engagement, a full design system and every screen mapped out in Figma before a line of code, since this was as much a chance to practice that process properly as it was to build something I wanted to use.',
+        },
+        {
+          heading: 'Two references, not one',
+          body: 'I worked from two real references instead of a blank page. The first was New Vegas’s own in-game Pip-Boy, its actual HUD, and the color option buried in the game’s settings menu, amber by default with green and blue alternates, which is exactly the toggle this app’s theme system mirrors. The second was Bethesda’s own Fallout 4 Pip-Boy Companion App, a real Bluetooth-paired second-screen product they shipped in 2015 for a later game, and the closest thing to prior art for this exact idea. I borrowed its tab structure, STAT, INV, DATA, MAP, RADIO, since that is a genuinely solved information architecture, but kept the visual language New Vegas’s own instead of the green CRT look the FO4 app and most fan clones default to. New Vegas’s own Pip-Boy runs amber, and that mattered more to me than matching Bethesda’s later, different-looking app.',
+        },
+        {
+          heading: 'Mapping the navigation first',
+          body: 'Before any screen, I mapped the navigation itself: Connect, then an app shell with STATUS, INV, DATA, and MAP as the four top-level tabs, in the game’s own order, so arriving already knowing where things live costs no relearning. Settings and Fast Travel hang off that shell as modals rather than a fifth and sixth tab, since configuration is not content and fast travel needed the map still visible underneath it, not a separate screen that hides the geography you are deciding about. I marked the diagram itself with a small legend, solid box for a decided element, dashed for placement or content still unresolved, grey bars for text not yet written, a crossed box for an image or render placeholder, so at any point the file itself showed what was actually settled and what still wasn’t, not just what was drawn.',
+          image: {
+            src: getImagePath('/projects/newvegas/figma-flow.jpg'),
+            badge: { kind: 'figma', label: 'Figma · Flow' },
+            caption: 'Navigation mapped before any screen: four tabs in the game’s own order, Settings and Fast Travel as modals off the shell',
+            maxWidth: 960,
+          },
+        },
+        {
+          heading: 'Wireframes, and what they committed to',
+          body: [
+            'From the flow I moved to low-fidelity wireframes for every screen, and next to each one I wrote down what that layout was actually committing to, in plain language, not just the boxes themselves. Inventory got list and detail side by side rather than stacked, because a stacked layout means a push-and-back trip for the single most repeated action in the app, just looking at an item. Map markers got anchored at their tip, not their center, so the point of the pin actually marks the place instead of floating above it by half the pin’s height. Icons were committed to single-color silhouettes, tinted at runtime, so one asset set covers every theme instead of shipping separate art per color.',
+            'Not everything got settled at this stage. One open question in the wireframes was whether the app needed one fixed viewport or real breakpoints for phone and desktop browsers too, marked open rather than guessed at. That one got answered by building it: one fixed viewport, tuned specifically to the AYN Thor’s panel, the same fact that shows up later as the handheld-specific sizing in the shipped app.',
+          ],
+          images: [
+            {
+              src: getImagePath('/projects/newvegas/figma-wireframe-status.png'),
+              badge: { kind: 'figma', label: 'Figma · Wireframe' },
+              caption: 'Status, wireframed: the body figure as the anchor, per-limb condition, settings tucked behind the corner control',
+            },
+            {
+              src: getImagePath('/projects/newvegas/figma-wireframe-inv.png'),
+              badge: { kind: 'figma', label: 'Figma · Wireframe' },
+              caption: 'Inventory, wireframed: list and detail side by side, actions under the detail rather than in the row',
+            },
+            {
+              src: getImagePath('/projects/newvegas/figma-wireframe-map.png'),
+              badge: { kind: 'figma', label: 'Figma · Wireframe' },
+              caption: 'Map, wireframed: chrome floats over a full-frame map, controls bottom-right where a thumb actually reaches',
+            },
+            {
+              src: getImagePath('/projects/newvegas/figma-wireframe-settings.png'),
+              badge: { kind: 'figma', label: 'Figma · Wireframe' },
+              caption: 'Settings, wireframed as a modal over Status: grouped rows, no nested navigation',
+            },
+          ],
+        },
+        {
+          heading: 'A design system, then components, then screens',
+          body: [
+            'I mapped this out the way I would want to work on a real product: tokens first, then components, then screens, each step built on the last instead of designing screens directly. Color, state, type, and spacing all got defined as a real design system before a single screen existed, including all three theme palettes together, so amber, green, and blue were never an afterthought bolted onto one finished look.',
+            'From there I built a full component sheet, tabs, buttons, badges, inventory rows, limb bars, map markers, and more, so every screen after that got assembled from pieces that already existed instead of one-off shapes. Only then did I design the actual screens, and that Figma file is what I built the app against, not a screenshot reference dug up after the fact.',
+          ],
+          images: [
+            {
+              src: getImagePath('/projects/newvegas/figma-foundations.png'),
+              badge: 'figma',
+              caption: 'Color, state, type, and spacing tokens, defined as a design system before any screen existed',
+            },
+            {
+              src: getImagePath('/projects/newvegas/figma-components.png'),
+              badge: 'figma',
+              caption: 'The component sheet built next: tabs, buttons, badges, inventory rows, map markers, and more, each with its real variants',
+            },
+          ],
+        },
+        {
+          heading: 'The screens, before any code',
+          body: 'Every screen, Status, Inventory, Data, Map, existed in Figma before I opened an editor, and building the app meant working against that file screen by screen instead of improvising layout in code as I went. The map is a good example of how closely the visual side carried over: the Mojave background, the marker icon, and the overall layout all matched the original screens directly. How you actually interact with the map did not carry over as cleanly, and that part is its own story.',
+          images: [
+            {
+              src: getImagePath('/projects/newvegas/figma-map.jpg'),
+              badge: 'figma',
+              caption: 'The map as designed in Figma',
+            },
+            {
+              src: getImagePath('/projects/newvegas/mojave-map.jpg'),
+              badge: 'built',
+              caption: 'The map as shipped, discovered locations marked across the region',
+            },
+          ],
+        },
+        {
+          heading: 'Every screen in the mockup',
+          body: 'The Figma file covers the whole app, not just the screens with a story attached to them. Connect, Status, both inventory tabs, both data tabs, the map, and both modals, all designed in full before any of it existed in code.',
+          carousel: [
+            { src: getImagePath('/projects/newvegas/hifi-connect.png'), badge: 'figma', caption: 'Connect' },
+            { src: getImagePath('/projects/newvegas/hifi-status.png'), badge: 'figma', caption: 'Status' },
+            { src: getImagePath('/projects/newvegas/hifi-inv-weapons.png'), badge: 'figma', caption: 'Inventory · Weapons' },
+            { src: getImagePath('/projects/newvegas/hifi-inv-aid.png'), badge: 'figma', caption: 'Inventory · Aid' },
+            { src: getImagePath('/projects/newvegas/hifi-data-quests.png'), badge: 'figma', caption: 'Data · Quests' },
+            { src: getImagePath('/projects/newvegas/hifi-data-radio.png'), badge: 'figma', caption: 'Data · Radio' },
+            { src: getImagePath('/projects/newvegas/hifi-map.jpg'), badge: 'figma', caption: 'Map' },
+            { src: getImagePath('/projects/newvegas/hifi-settings-modal.png'), badge: 'figma', caption: 'Settings modal' },
+            { src: getImagePath('/projects/newvegas/hifi-fast-travel-modal.png'), badge: 'figma', caption: 'Fast Travel modal' },
+          ],
+        },
+        {
+          heading: 'Getting the map right',
+          body: 'The marker mechanism did not survive first contact with a real device. The first version let you drop a custom marker with a long press, which looked fine as a static screen in Figma but fought with the map’s own pan gesture once it was something you could actually touch, since the same finger motion that pans the map can register as a hold. I replaced it with a fixed reticle at the center of the screen, you pan the map under it and tap to drop a marker there, so placing a pin never competes with moving around. It also has a follow-mode that recenters on your live position, and turns itself off the moment you pan or zoom manually, so it never fights you for control of the view. Calibrating the map itself, matching real in-game coordinates to the static Mojave image, took several passes of nudging the offset and scale until named locations like Goodsprings and Novac landed where they should, that part was never going to happen in a design tool, only against real data.',
+        },
+        {
+          heading: 'Designed to be glanced at, not used',
+          body: 'The core constraint is that your attention is on the game, not this screen. So status loads first when you open it, since HP and AP are what you check mid-fight, not inventory or the map. Every screen updates on its own over the WebSocket, at whatever rate that data actually needs (player position every 50ms, inventory every 200ms), so there is nothing to pull or refresh. And when you’re in combat, a soft red glow builds at the screen edges instead of a stat you’d have to read, so you can catch it in your peripheral vision without looking away from the game.',
+        },
+        {
+          heading: 'How it works',
+          body: 'The catch is that a game from 2010 does not hand you its live state. So there are two halves. A plugin written in C++ runs inside the game through NVSE and serves the player’s data over a local WebSocket. A web client reads that stream and renders the interface. When your health drops or you pick something up, the plugin sees it and the second screen updates in near real time. Most of the interesting work was on that seam: what data to pull, how often, and how to keep the two in sync without hitching the game.',
+        },
+        {
+          heading: 'Built for two screens',
+          body: 'The client is Vue 3 and Vite, wrapped with Capacitor so it ships as both an installable web app (PWA) and an Android APK. I gave it a CRT Pip-Boy look, amber phosphor and scanlines by default, matching New Vegas’s actual in-game color rather than the green most Fallout Pip-Boy clones default to, with green and blue as selectable alternates. The layout is tuned to one fixed viewport, a specific handheld resolution like the AYN Thor, so the stats screen fits without cropping instead of just scaling generically, settling the breakpoints-or-not question the wireframes had left open.',
+          images: [
+            {
+              src: getImagePath('/projects/newvegas/figma-status-amber.png'),
+              badge: 'figma',
+              caption: 'Amber, the default',
+            },
+            {
+              src: getImagePath('/projects/newvegas/figma-status-green.png'),
+              badge: 'figma',
+              caption: 'Green, one tap away (blue is the third option)',
+            },
+          ],
+        },
+        {
+          heading: 'On the actual hardware',
+          body: 'This is not a screenshot resized to guess at a phone. It is the actual AYN Thor: New Vegas running on the top screen, the web monitor live on the bottom, both visible at once, tapped with a finger instead of a mouse. Inventory, fast travel, and switching radio stations, all filmed on the device it was built for.',
+          videos: [
+            {
+              src: getImagePath('/projects/newvegas/device-inventory.mp4'),
+              badge: 'device',
+              poster: getImagePath('/projects/newvegas/poster-inventory.jpg'),
+              caption: 'Browsing inventory live on the second screen',
+            },
+            {
+              src: getImagePath('/projects/newvegas/device-map.mp4'),
+              badge: 'device',
+              poster: getImagePath('/projects/newvegas/poster-map.jpg'),
+              caption: 'Fast travel, confirmed with a tap on the actual device',
+            },
+            {
+              src: getImagePath('/projects/newvegas/device-radio.mp4'),
+              badge: 'device',
+              poster: getImagePath('/projects/newvegas/poster-radio.jpg'),
+              hasAudio: true,
+              caption: 'Switching radio stations, tap the speaker for sound',
+            },
+          ],
+        },
+        {
+          heading: 'Credits',
+          body: [
+            'Built on SkyrimWebMonitor (MIT licensed) by andreyvelsk, which does the same thing for Skyrim. I rebuilt it for New Vegas: a new game plugin, new data models for New Vegas’s stats and items, a new UI, and the Mojave map in place of Skyrim’s.',
+            'Icons from game-icons.net, additional Pip-Boy icons from ItsMeJesusHChrist, and Vault Boy art from fluffgar.',
+            'Fallout: New Vegas is Bethesda Softworks and Obsidian Entertainment’s. This is an unofficial fan project.',
+          ],
+        },
+      ],
+      gallery: [
+        {
+          src: getImagePath('/projects/newvegas/pipboy-status.png'),
+          badge: 'built',
+          caption: 'The Pip-Boy status screen: level, health, action points, and SPECIAL stats, shown in the app’s demo mode',
+        },
+        {
+          src: getImagePath('/projects/newvegas/inventory.png'),
+          badge: 'built',
+          caption: 'The inventory tab, listing weapons and ammo with per-item detail',
+        },
+      ],
+    },
+    links: {
+      live: 'https://niclagr.github.io/NewVegasWebMonitor/',
+      repo: 'https://github.com/NicLagr/NewVegasWebMonitor',
+    },
   },
   {
     id: 'weather-viz',
@@ -519,78 +735,6 @@ export const projects = [
       ],
     },
     links: {},
-  },
-  {
-    id: 'newvegas',
-    title: 'New Vegas Web Monitor',
-    org: 'Personal',
-    year: '2026',
-    role: 'Solo · Design + Engineering',
-    summary:
-      'A Pip-Boy-style second screen for Fallout: New Vegas. A native game plugin streams live player state to a web app over WebSocket, so you can read status, inventory, and the Mojave map on a second display while you play.',
-    highlights: [
-      'Designed status as the default view, since HP and AP are what you check first mid-fight, with every screen auto-updating over WebSocket so it works as a glance, not an app you operate.',
-      'Built a peripheral combat indicator, a soft glow at the screen edges when you’re in a fight, since your eyes are on the game, not this screen.',
-      'Redesigned marker placement after the first version (long-press) fought with the map’s own pan gesture; replaced it with a fixed reticle you aim by panning underneath it.',
-      'Wrote a C++ NVSE plugin serving player data over a local WebSocket, and a Vue 3 + Capacitor client tuned to fit specific handheld resolutions without cropping.',
-    ],
-    tags: ['UX Design', 'Vue 3', 'TypeScript', 'C++', 'WebSocket', 'PWA', 'Capacitor'],
-    image: getImagePath('/projects/newvegas/pipboy-status.png'),
-    // the Work row is extremely wide-and-short, so a plain cover-crop of the
-    // full screenshot only ever shows a thin sliver (just the forehead) —
-    // this is a pre-cropped, already-framed band around the vault boy instead
-    rowMedia: getImagePath('/projects/newvegas/pipboy-status-wide.jpg'),
-    accent: 'var(--accent-grad)',
-    caseStudy: {
-      sections: [
-        {
-          heading: 'The idea',
-          body: 'Fallout: New Vegas has a wrist computer called the Pip-Boy that holds your stats, inventory, and map. New Vegas Web Monitor takes that out of the game and puts it on a second screen. You play on your main display, and your phone or a second monitor becomes a live Pip-Boy: status, inventory, and the Mojave map, updating as you play. I built it mostly for dual-screen handhelds, where there is a second panel sitting right there doing nothing.',
-        },
-        {
-          heading: 'Designed to be glanced at, not used',
-          body: 'The core constraint is that your attention is on the game, not this screen. So status loads first when you open it, since HP and AP are what you check mid-fight, not inventory or the map. Every screen updates on its own over the WebSocket, at whatever rate that data actually needs (player position every 50ms, inventory every 200ms), so there is nothing to pull or refresh. And when you’re in combat, a soft red glow builds at the screen edges instead of a stat you’d have to read, so you can catch it in your peripheral vision without looking away from the game.',
-        },
-        {
-          heading: 'How it works',
-          body: 'The catch is that a game from 2010 does not hand you its live state. So there are two halves. A plugin written in C++ runs inside the game through NVSE and serves the player’s data over a local WebSocket. A web client reads that stream and renders the interface. When your health drops or you pick something up, the plugin sees it and the second screen updates in near real time. Most of the interesting work was on that seam: what data to pull, how often, and how to keep the two in sync without hitching the game.',
-        },
-        {
-          heading: 'Getting the map right',
-          body: 'The map went through a real redesign. The first version let you drop a custom marker with a long press, but that fought with the map’s own pan gesture, since the same finger motion that pans the map can register as a hold. I replaced it with a fixed reticle at the center of the screen: you pan the map under it and tap to drop a marker there, so placing a pin never competes with moving around. It also has a follow-mode that recenters on your live position, and turns itself off the moment you pan or zoom manually, so it never fights you for control of the view. Calibrating the map itself, matching real in-game coordinates to the static Mojave image, took several passes of nudging the offset and scale until named locations like Goodsprings and Novac landed where they should.',
-        },
-        {
-          heading: 'Built for two screens',
-          body: 'The client is Vue 3 and Vite, wrapped with Capacitor so it ships as both an installable web app (PWA) and an Android APK. I gave it a CRT Pip-Boy look, amber phosphor and scanlines by default, matching New Vegas’s actual in-game color rather than the green most Fallout Pip-Boy clones default to, with green and blue as selectable alternates. The layout is tuned to specific handheld resolutions, like the AYN Thor, so the stats screen fits without cropping instead of just scaling generically.',
-        },
-        {
-          heading: 'Credits',
-          body: [
-            'Built on SkyrimWebMonitor (MIT licensed) by andreyvelsk, which does the same thing for Skyrim. I rebuilt it for New Vegas: a new game plugin, new data models for New Vegas’s stats and items, a new UI, and the Mojave map in place of Skyrim’s.',
-            'Icons from game-icons.net, additional Pip-Boy icons from ItsMeJesusHChrist, and Vault Boy art from fluffgar.',
-            'Fallout: New Vegas is Bethesda Softworks and Obsidian Entertainment’s. This is an unofficial fan project.',
-          ],
-        },
-      ],
-      gallery: [
-        {
-          src: getImagePath('/projects/newvegas/pipboy-status.png'),
-          caption: 'The Pip-Boy status screen: level, health, action points, and SPECIAL stats, shown in the app’s demo mode',
-        },
-        {
-          src: getImagePath('/projects/newvegas/inventory.png'),
-          caption: 'The inventory tab, listing weapons and ammo with per-item detail',
-        },
-        {
-          src: getImagePath('/projects/newvegas/mojave-map.jpg'),
-          caption: 'The Mojave Wasteland map, with discovered locations marked across the region',
-        },
-      ],
-    },
-    links: {
-      live: 'https://niclagr.github.io/NewVegasWebMonitor/',
-      repo: 'https://github.com/NicLagr/NewVegasWebMonitor',
-    },
   },
   {
     id: 'portfolio',

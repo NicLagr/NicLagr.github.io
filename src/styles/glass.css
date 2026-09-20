@@ -322,6 +322,37 @@ a, button, [role="button"], .gx-tappable { cursor: pointer; }
   -webkit-backdrop-filter: blur(8px);
 }
 
+/* provenance badge — "is this a design file or the running thing?"
+   Inline, ahead of caption text rather than overlaid on the media: a tag on
+   the artwork covers the work and competes with it, and the caption line is
+   already where a reader looks to find out what they're seeing. */
+.gx-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.34rem;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.035em;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--ink);
+  vertical-align: baseline;
+  margin-right: 0.15rem;
+}
+.gx-badge__icon {
+  display: inline-flex;
+  flex: none;
+}
+/* hairline between the tag and the caption it introduces */
+.gx-badge__rule {
+  display: inline-block;
+  width: 1px;
+  height: 0.78em;
+  margin-left: 0.3rem;
+  background: var(--glass-edge-soft);
+}
+
 /* XMB-style channel row */
 .gx-channel {
   position: relative;
