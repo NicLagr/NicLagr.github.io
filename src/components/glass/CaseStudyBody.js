@@ -226,10 +226,20 @@ const CarouselChrome = ({ n, cardW, activeCaption, activeBadge, active, stepPrev
 // instead of just re-rendering. Harmless for these still images beyond some
 // wasted work, but the same mistake in `VideoCarouselCard` below is what
 // silently broke the video/audio, so both are hoisted out on principle.
-const CarouselImageCard = ({ im, i, domIndex, isActive, onOpen, startIndex, goToDom }) => (
+// `isCanonical` marks the first of the three DOM copies (see CAROUSEL_COPIES
+// above) — the other two exist purely so the scroll-loop illusion has
+// off-screen buffer to shift into, and duplicate every item's alt text
+// again. Left alone, a screen reader (or any tool that reads accessible
+// text/alt rather than pixels) hits every caption three times in a row.
+// Hiding the non-canonical copies from the accessibility tree fixes that
+// without touching the visual scroll/click mechanics, which need all three
+// copies physically present in the DOM regardless.
+const CarouselImageCard = ({ im, i, domIndex, isActive, isCanonical, onOpen, startIndex, goToDom }) => (
   <button
     onClick={() => (isActive ? onOpen(startIndex + i) : goToDom(domIndex))}
     className="flex-none gx-selectable"
+    aria-hidden={isCanonical ? undefined : true}
+    tabIndex={isCanonical ? undefined : -1}
     style={{
       scrollSnapAlign: 'center',
       width: CAROUSEL_CARD_W,
@@ -250,7 +260,7 @@ const CarouselImageCard = ({ im, i, domIndex, isActive, onOpen, startIndex, goTo
     >
       <img
         src={im.src}
-        alt={im.caption || ''}
+        alt={isCanonical ? (im.caption || '') : ''}
         loading="lazy"
         className="absolute inset-0 w-full h-full object-cover"
         onError={hideTile}
@@ -281,6 +291,7 @@ const Carousel = ({ items, startIndex, onOpen }) => {
           i={i}
           domIndex={domIndex}
           isActive={domIndex === activeDom}
+          isCanonical={domIndex < n}
           onOpen={onOpen}
           startIndex={startIndex}
           goToDom={goToDom}
@@ -315,10 +326,12 @@ const Carousel = ({ items, startIndex, onOpen }) => {
 // existing `<video>` DOM node just gets its `muted` property flipped in
 // place, the same element, same playback, same gesture — which browsers do
 // allow.
-const VideoCarouselCard = ({ im, isActive, muted, onToggleMute, domIndex, goToDom }) => (
+const VideoCarouselCard = ({ im, isActive, muted, onToggleMute, domIndex, goToDom, isCanonical }) => (
   <div
     role="button"
-    tabIndex={0}
+    tabIndex={isCanonical ? 0 : -1}
+    aria-hidden={isCanonical ? undefined : true}
+    aria-label={im.caption || undefined}
     onClick={() => !isActive && goToDom(domIndex)}
     onKeyDown={(e) => { if (!isActive && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); goToDom(domIndex); } }}
     className={isActive ? 'flex-none' : 'flex-none gx-selectable'}
@@ -391,6 +404,7 @@ const VideoCarousel = ({ items }) => {
           im={items[i]}
           domIndex={domIndex}
           isActive={domIndex === activeDom}
+          isCanonical={domIndex < n}
           muted={muted}
           onToggleMute={() => setMuted((m) => !m)}
           goToDom={goToDom}
@@ -583,10 +597,20 @@ const CaseStudyBody = ({ project, showHero = true, showMeta = true }) => {
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 onError={hideTile}
               />
+              {/* No line clamp here. `line-clamp-2` looks right but silently
+                  does nothing on this node — the clamp needs `display:
+                  -webkit-box` and the absolutely-positioned span computes to
+                  `flow-root`, so the only thing that took effect was the
+                  `overflow: hidden`, which cut a three-line caption off
+                  mid-word with no ellipsis to show for it. Letting the
+                  overlay size to its own text keeps the caption whole; the
+                  scrim already covers however tall it ends up, and these
+                  captions carry the reasoning, so truncating them is the
+                  wrong trade anyway. */}
               {g.caption && (
                 <span
-                  className="absolute inset-x-0 bottom-0 p-3 text-xs leading-snug line-clamp-2"
-                  style={{ background: 'linear-gradient(180deg, transparent, rgba(3,4,10,0.88) 70%)', color: 'var(--ink-dim)' }}
+                  className="absolute inset-x-0 bottom-0 p-3 text-xs leading-snug"
+                  style={{ background: 'linear-gradient(180deg, transparent, rgba(3,4,10,0.88) 45%)', color: 'var(--ink-dim)' }}
                 >
                   {g.caption}
                 </span>

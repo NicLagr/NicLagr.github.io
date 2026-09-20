@@ -9,7 +9,7 @@ const CaseStudyPage = ({ project }) => {
     // wider than PageShell's 880 default — the image pairs and the Figma
     // embed inside CaseStudyBody use up to 960px so screenshots stay legible
     // on a laptop screen; the prose column itself still holds at 680
-    <PageShell title={project.title} eyebrow="Case study" maxWidth={1040}>
+    <PageShell title={project.title} eyebrow="Case study" subtitle={project.caseStudy.subtitle} maxWidth={1040}>
       <CaseStudyBody project={project} />
     </PageShell>
   );

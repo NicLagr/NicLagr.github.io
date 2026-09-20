@@ -114,6 +114,7 @@ export const projects = [
     accent: 'var(--accent-grad)',
     caseStudy: {
       hero: getImagePath('/projects/jewelry-crm/iPad Pro mockup.png'),
+      subtitle: 'An iPad CRM and repair tracker, in daily use at a working jewelry store.',
       sections: [
         {
           heading: 'The problem',
@@ -252,10 +253,11 @@ export const projects = [
       // study specifically, since it ties directly to the "amber, green,
       // blue" theme story later in the page
       hero: getImagePath('/projects/newvegas/device-mockup-array.png'),
+      subtitle: 'A live Pip-Boy companion screen for Fallout: New Vegas.',
       sections: [
         {
-          heading: 'What a Pip-Boy is',
-          body: 'The Pip-Boy is the wrist computer every playable character wears in the Fallout series. It holds your stats, inventory, map, and radio, and it is one of the more recognizable pieces of interface design in games, a HUD that is actually an object your character is wearing instead of a floating overlay. New Vegas Web Monitor takes that object out of the game and puts it on a second screen. You play Fallout: New Vegas on your main display, and your phone or a second monitor becomes a live Pip-Boy, status, inventory, and the Mojave map, updating as you actually play. I built it for dual-screen Android handhelds specifically, where there is a second panel sitting a few inches from the game doing nothing. I also ran the project the way I would want to run a real design engagement, a full design system and every screen mapped out in Figma before a line of code, since this was as much a chance to practice that process properly as it was to build something I wanted to use.',
+          heading: 'An idle second screen',
+          body: 'Dual-screen Android handhelds, like the AYN Thor I built this for, have a second panel sitting a few inches from whatever is on the main screen, and on most games it just sits there doing nothing. New Vegas Web Monitor turns that idle panel into a live companion display for Fallout: New Vegas, a 2010 PC game that was never built to support a second screen. It mirrors the Pip-Boy, the wrist computer every playable character wears in the series, a HUD that is actually an object your character wears instead of a floating overlay: status, inventory, and the Mojave map, updating in real time as you actually play. I also ran the project the way I would want to run a real design engagement, a full design system and every screen mapped out in Figma before a line of code, since this was as much a chance to practice that process properly as it was to build something I wanted to use.',
         },
         {
           heading: 'Two references, not one',
@@ -310,18 +312,35 @@ export const projects = [
             {
               src: getImagePath('/projects/newvegas/figma-foundations.png'),
               badge: 'figma',
-              caption: 'Color, state, type, and spacing tokens, defined as a design system before any screen existed',
+              caption: 'All three theme palettes, amber, green, blue, built into the same token set from day one, so switching themes was never a coat of paint bolted onto one finished look',
             },
             {
               src: getImagePath('/projects/newvegas/figma-components.png'),
               badge: 'figma',
-              caption: 'The component sheet built next: tabs, buttons, badges, inventory rows, map markers, and more, each with its real variants',
+              caption: 'A real variant for every state, so when Inventory needed a row and Data needed one too, both came from the same piece instead of two one-off shapes',
             },
           ],
         },
         {
-          heading: 'The screens, before any code',
-          body: 'Every screen, Status, Inventory, Data, Map, existed in Figma before I opened an editor, and building the app meant working against that file screen by screen instead of improvising layout in code as I went. The map is a good example of how closely the visual side carried over: the Mojave background, the marker icon, and the overall layout all matched the original screens directly. How you actually interact with the map did not carry over as cleanly, and that part is its own story.',
+          heading: 'Every screen in the mockup',
+          body: 'The Figma file covers the whole app: Connect, Status, both inventory tabs, both data tabs, both modals, and the map, which gets its own section below. All of it designed in full before any of it existed in code, and each screen carrying a reason rather than just a layout.',
+          carousel: [
+            { src: getImagePath('/projects/newvegas/hifi-connect.png'), badge: 'figma', caption: 'Connect, the app’s front door before any live data exists' },
+            { src: getImagePath('/projects/newvegas/hifi-status.png'), badge: 'figma', caption: 'Status, the default view, since HP and AP are what you check first mid-fight' },
+            { src: getImagePath('/projects/newvegas/hifi-inv-weapons.png'), badge: 'figma', caption: 'Inventory · Weapons, list and detail side by side, not stacked, so the single most repeated action never costs a push-and-back trip' },
+            { src: getImagePath('/projects/newvegas/hifi-inv-aid.png'), badge: 'figma', caption: 'Inventory · Aid, the same row and detail components as Weapons, holding different data' },
+            { src: getImagePath('/projects/newvegas/hifi-data-quests.png'), badge: 'figma', caption: 'Data · Quests, your active objectives, so the second screen can answer what to do next without pausing the game' },
+            { src: getImagePath('/projects/newvegas/hifi-data-radio.png'), badge: 'figma', caption: 'Data · Radio, station list and now-playing, the one tab you can use without looking at it' },
+            { src: getImagePath('/projects/newvegas/hifi-settings-modal.png'), badge: 'figma', caption: 'Settings, as a modal off the shell rather than a fifth tab, since configuration is not content' },
+            { src: getImagePath('/projects/newvegas/hifi-fast-travel-modal.png'), badge: 'figma', caption: 'Fast Travel, also a modal, so the geography you are deciding about stays visible underneath it' },
+          ],
+        },
+        {
+          heading: 'Getting the map right',
+          body: [
+            'The map is where the Figma file and the shipped app line up most closely, and where they diverge most sharply. The Mojave background, the marker icon, and the overall layout all carried over directly from the design file. How you actually interact with the map did not.',
+            'The first version let you drop a custom marker with a long press, which looked fine as a static screen in Figma but fought with the map’s own pan gesture the moment it was something you could actually touch, since the same finger motion that pans the map can register as a hold. I replaced it with a fixed reticle at the center of the screen, you pan the map under it and tap to drop a marker there, so placing a pin never competes with moving around. It also has a follow-mode that recenters on your live position, and turns itself off the moment you pan or zoom manually, so it never fights you for control of the view. Calibrating the map itself, matching real in-game coordinates to the static Mojave image, took several passes of nudging the offset and scale until named locations like Goodsprings and Novac landed where they should, that part was never going to happen in a design tool, only against real data.',
+          ],
           images: [
             {
               src: getImagePath('/projects/newvegas/figma-map.jpg'),
@@ -329,30 +348,16 @@ export const projects = [
               caption: 'The map as designed in Figma',
             },
             {
-              src: getImagePath('/projects/newvegas/mojave-map.jpg'),
+              // captured at the app's own 784x900 handheld viewport, the same
+              // framing as the Figma screen beside it — the older wide capture
+              // (mojave-map.jpg, still in /public) was a desktop-width browser
+              // shot that letterboxed the app into the middle third, so the
+              // pair read as two unrelated images and left a hole in the grid
+              src: getImagePath('/projects/newvegas/mojave-map-handheld.jpg'),
               badge: 'built',
               caption: 'The map as shipped, discovered locations marked across the region',
             },
           ],
-        },
-        {
-          heading: 'Every screen in the mockup',
-          body: 'The Figma file covers the whole app, not just the screens with a story attached to them. Connect, Status, both inventory tabs, both data tabs, the map, and both modals, all designed in full before any of it existed in code.',
-          carousel: [
-            { src: getImagePath('/projects/newvegas/hifi-connect.png'), badge: 'figma', caption: 'Connect' },
-            { src: getImagePath('/projects/newvegas/hifi-status.png'), badge: 'figma', caption: 'Status' },
-            { src: getImagePath('/projects/newvegas/hifi-inv-weapons.png'), badge: 'figma', caption: 'Inventory · Weapons' },
-            { src: getImagePath('/projects/newvegas/hifi-inv-aid.png'), badge: 'figma', caption: 'Inventory · Aid' },
-            { src: getImagePath('/projects/newvegas/hifi-data-quests.png'), badge: 'figma', caption: 'Data · Quests' },
-            { src: getImagePath('/projects/newvegas/hifi-data-radio.png'), badge: 'figma', caption: 'Data · Radio' },
-            { src: getImagePath('/projects/newvegas/hifi-map.jpg'), badge: 'figma', caption: 'Map' },
-            { src: getImagePath('/projects/newvegas/hifi-settings-modal.png'), badge: 'figma', caption: 'Settings modal' },
-            { src: getImagePath('/projects/newvegas/hifi-fast-travel-modal.png'), badge: 'figma', caption: 'Fast Travel modal' },
-          ],
-        },
-        {
-          heading: 'Getting the map right',
-          body: 'The marker mechanism did not survive first contact with a real device. The first version let you drop a custom marker with a long press, which looked fine as a static screen in Figma but fought with the map’s own pan gesture once it was something you could actually touch, since the same finger motion that pans the map can register as a hold. I replaced it with a fixed reticle at the center of the screen, you pan the map under it and tap to drop a marker there, so placing a pin never competes with moving around. It also has a follow-mode that recenters on your live position, and turns itself off the moment you pan or zoom manually, so it never fights you for control of the view. Calibrating the map itself, matching real in-game coordinates to the static Mojave image, took several passes of nudging the offset and scale until named locations like Goodsprings and Novac landed where they should, that part was never going to happen in a design tool, only against real data.',
         },
         {
           heading: 'Designed to be glanced at, not used',
@@ -360,7 +365,7 @@ export const projects = [
         },
         {
           heading: 'How it works',
-          body: 'The catch is that a game from 2010 does not hand you its live state. So there are two halves. A plugin written in C++ runs inside the game through NVSE and serves the player’s data over a local WebSocket. A web client reads that stream and renders the interface. When your health drops or you pick something up, the plugin sees it and the second screen updates in near real time. Most of the interesting work was on that seam: what data to pull, how often, and how to keep the two in sync without hitching the game.',
+          body: 'The catch is that a game from 2010 does not hand you its live state. So there are two halves. A plugin written in C++ runs inside the game through NVSE, the community-built scripting extender most New Vegas mods rely on, and serves the player’s data over a local WebSocket. A web client reads that stream and renders the interface. When your health drops or you pick something up, the plugin sees it and the second screen updates in near real time. Most of the interesting work was on that seam: what data to pull, how often, and how to keep the two in sync without hitching the game.',
         },
         {
           heading: 'Built for two screens',
@@ -404,6 +409,10 @@ export const projects = [
           ],
         },
         {
+          heading: 'Looking back',
+          body: 'Running the whole process solo, design system through shipped code, taught me how much of a real design-to-code handoff is just decisions staying legible over time. The flow diagram’s open-versus-decided legend is the only reason I could trust a six-week-old decision instead of re-litigating it. If I did this again, I would build the map calibration tooling first instead of last, eyeballing coordinate offsets by hand was the slowest part of the whole project by a wide margin. I would also want to test it with someone who has never played Fallout, since most of my own usability assumptions turned out to just be muscle memory from having played the game myself.',
+        },
+        {
           heading: 'Credits',
           body: [
             'Built on SkyrimWebMonitor (MIT licensed) by andreyvelsk, which does the same thing for Skyrim. I rebuilt it for New Vegas: a new game plugin, new data models for New Vegas’s stats and items, a new UI, and the Mojave map in place of Skyrim’s.',
@@ -416,7 +425,7 @@ export const projects = [
         {
           src: getImagePath('/projects/newvegas/pipboy-status.png'),
           badge: 'built',
-          caption: 'The Pip-Boy status screen: level, health, action points, and SPECIAL stats, shown in the app’s demo mode',
+          caption: 'The Pip-Boy status screen: level, health, action points, and SPECIAL stats (the game’s seven core attributes), shown in the app’s demo mode',
         },
         {
           src: getImagePath('/projects/newvegas/inventory.png'),
@@ -452,6 +461,7 @@ export const projects = [
     visualColors: ['#b69dff', '#7aa2ff'],
     accent: 'var(--accent-grad)',
     caseStudy: {
+      subtitle: 'A real-time 3D weather and flight visualization tool for domain scientists and aviation partners.',
       sections: [
         {
           heading: 'The job',
@@ -513,6 +523,7 @@ export const projects = [
     visualColors: ['#b69dff', '#5ee7c6'],
     accent: 'var(--accent-grad)',
     caseStudy: {
+      subtitle: 'A SaaS tool airlines use to weigh emissions-reduction tradeoffs across their fleet.',
       sections: [
         {
           heading: 'The brief',
@@ -572,6 +583,7 @@ export const projects = [
     },
     caseStudy: {
       hero: getImagePath('/projects/mission-control/hero-globe.jpg'),
+      subtitle: 'A live global-activity dashboard built for executive tours of the Tulip Experience Center.',
       sections: [
         {
           heading: 'The brief',
@@ -627,6 +639,7 @@ export const projects = [
     accent: 'var(--accent-grad)',
     caseStudy: {
       hero: getImagePath('/projects/tec-demos/popup-factory.jpg'),
+      subtitle: 'Live industrial demos, designed around who was touring and engineered to run in front of executives.',
       sections: [
         {
           heading: 'The job',
@@ -702,6 +715,7 @@ export const projects = [
     image: getImagePath('/projects/nurture-nest/app-screens.jpg'),
     accent: 'var(--accent-grad)',
     caseStudy: {
+      subtitle: 'A mobile-first maternal-health app built for accessibility in rural communities.',
       sections: [
         {
           heading: 'The problem',
@@ -756,6 +770,7 @@ export const projects = [
     rowMedia: getImagePath('/projects/portfolio/hero-wide.jpg'),
     accent: 'var(--accent-grad)',
     caseStudy: {
+      subtitle: 'A portfolio built as a single glass object you can turn and open.',
       sections: [
         {
           heading: 'The idea',

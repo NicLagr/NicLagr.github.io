@@ -135,6 +135,18 @@ export const ProjectSheet = ({ project, onClose }) => {
               >
                 <TbArrowLeft size={16} /> Overview
               </button>
+              {/* Same one-line framing the standalone case-study page puts
+                  under its title (see PageShell). Switching to this tab hides
+                  the overview's `project.summary`, so without this the sheet
+                  drops straight into the first section with nothing saying
+                  what the project is. Each header owns its own copy because
+                  the two layouts place it differently: there it sits between
+                  the title and the hero, here under the tab's back button. */}
+              {project.caseStudy?.subtitle && (
+                <p className="text-lg leading-snug mb-7" style={{ color: 'var(--ink-dim)' }}>
+                  {project.caseStudy.subtitle}
+                </p>
+              )}
               <CaseStudyBody project={project} showHero={false} showMeta={false} />
             </>
           ) : (

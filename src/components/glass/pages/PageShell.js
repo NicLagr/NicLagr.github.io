@@ -12,7 +12,7 @@ const fadeUp = {
  * Blackout + aurora to match the hero; a console-style header; a reading column.
  * The enter/exit motion (expand-from-face) is owned by CubeConsole.
  */
-const PageShell = ({ title, eyebrow, children, maxWidth = 880 }) => (
+const PageShell = ({ title, eyebrow, subtitle, children, maxWidth = 880 }) => (
   <motion.div
     initial="hidden"
     animate="show"
@@ -28,6 +28,11 @@ const PageShell = ({ title, eyebrow, children, maxWidth = 880 }) => (
       <h1 className="gx-display font-semibold tracking-[-0.02em]" style={{ fontSize: 'clamp(2.2rem, 5.5vw, 3.4rem)' }}>
         {title}
       </h1>
+      {subtitle && (
+        <p className="mt-3 text-lg sm:text-xl leading-snug" style={{ color: 'var(--ink-dim)', maxWidth: 640 }}>
+          {subtitle}
+        </p>
+      )}
     </motion.div>
 
     {children}
