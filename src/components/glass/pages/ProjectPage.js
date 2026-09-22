@@ -2,7 +2,7 @@ import React, { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useStat
 import { motion } from 'framer-motion';
 import PageShell, { pageFadeUp } from './PageShell';
 import CaseStudyBody from '../CaseStudyBody';
-import { TbArrowUpRight, TbCode } from '../icons';
+import { TbArrowUpRight, TbCode, TbPresentation, TbClick } from '../icons';
 import ProjectVisual, { VisualCaption } from '../ProjectVisual';
 import sfx from '../sfx';
 import { CUBE_PALETTES } from '../cubePalettes';
@@ -262,7 +262,7 @@ const ProjectPage = ({ project }) => {
         ))}
       </motion.div>
 
-      {(links.live || links.repo) && (
+      {(links.live || links.repo || links.deck || links.proto) && (
         <motion.div variants={pageFadeUp} className="flex flex-wrap gap-3">
           {links.live && (
             <a href={links.live} target="_blank" rel="noopener noreferrer" onClick={() => sfx.open()} className="gx-btn gx-btn-primary">
@@ -272,6 +272,16 @@ const ProjectPage = ({ project }) => {
           {links.repo && (
             <a href={links.repo} target="_blank" rel="noopener noreferrer" onClick={() => sfx.open()} className="gx-btn">
               <TbCode size={18} /> Source code
+            </a>
+          )}
+          {links.proto && (
+            <a href={links.proto} target="_blank" rel="noopener noreferrer" onClick={() => sfx.open()} className={links.live ? 'gx-btn' : 'gx-btn gx-btn-primary'}>
+              <TbClick size={18} /> Try the prototype
+            </a>
+          )}
+          {links.deck && (
+            <a href={links.deck} target="_blank" rel="noopener noreferrer" onClick={() => sfx.open()} className="gx-btn">
+              <TbPresentation size={18} /> Slide deck
             </a>
           )}
         </motion.div>

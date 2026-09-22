@@ -22,5 +22,7 @@ export {
   TbVolume,
   TbVolumeOff,
   TbList,
+  TbPresentation,
+  TbClick,
   Tb3DCubeSphere,
 } from 'react-icons/tb';

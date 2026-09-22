@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { projects } from '../../../data/portfolio';
-import { TbX, TbArrowUpRight, TbCode, TbFileText, TbArrowLeft } from '../icons';
+import { TbX, TbArrowUpRight, TbCode, TbFileText, TbArrowLeft, TbPresentation, TbClick } from '../icons';
 import SectionLabel from '../SectionLabel';
 import CaseStudyBody from '../CaseStudyBody';
 import ProjectVisual, { canWebGL, VisualCaption } from '../ProjectVisual';
@@ -202,7 +202,7 @@ export const ProjectSheet = ({ project, onClose }) => {
             ))}
           </div>
 
-          {(hasCaseStudy || links.live || links.repo) && (
+          {(hasCaseStudy || links.live || links.repo || links.deck || links.proto) && (
             <div className="flex flex-wrap gap-3">
               {hasCaseStudy && (
                 <button
@@ -221,6 +221,16 @@ export const ProjectSheet = ({ project, onClose }) => {
               {links.repo && (
                 <a href={links.repo} target="_blank" rel="noopener noreferrer" className="gx-btn">
                   <TbCode size={18} /> Source code
+                </a>
+              )}
+              {links.proto && (
+                <a href={links.proto} target="_blank" rel="noopener noreferrer" className="gx-btn">
+                  <TbClick size={18} /> Try the prototype
+                </a>
+              )}
+              {links.deck && (
+                <a href={links.deck} target="_blank" rel="noopener noreferrer" className="gx-btn">
+                  <TbPresentation size={18} /> Slide deck
                 </a>
               )}
             </div>

@@ -94,6 +94,156 @@ export const experience = [
 // Work projects (games live separately in data/games.js, surfaced in "Play").
 export const projects = [
   {
+    id: 'nurture-nest',
+    title: 'Nurture Nest',
+    org: 'Innovators for Global Health',
+    year: '2025 – 2026',
+    role: 'UX & Frontend',
+    summary:
+      'Mobile-first maternal-health app with flows for tracking, alerts, and education, designed for accessibility in rural communities.',
+    highlights: [
+      'Collaborated on UX design in Figma and React frontend.',
+      'Accessibility-first, mobile-first patterns for low-bandwidth contexts.',
+      'Presented the working prototype at Northeastern’s RISE expo, funded by a PEAK Experience Award.',
+    ],
+    tags: ['Figma', 'React', 'UX', 'Accessibility', 'Healthcare'],
+    image: getImagePath('/projects/nurture-nest/hero.jpg'),
+    accent: 'var(--accent-grad)',
+    caseStudy: {
+      subtitle: 'Maternal mental health support for rural Ghana, designed around what people already believe rather than against it.',
+      sections: [
+        {
+          heading: 'Mission',
+          body: 'Give a pregnant or new mother in rural Ghana a way to notice how she is doing, and a reason to say it out loud to someone who can help.',
+        },
+        {
+          heading: 'Context',
+          body: [
+            'Nurture Nest is a student project through Innovators for Global Health, in partnership with the Dwenase Health Centre in Ghana. Postpartum depression and anxiety are common there and care is thin. Stigma, distance and too few professionals keep most women from reaching any of it.',
+            'I was on the tech team from the start: initial planning, the UX and UI flows, some of the Figma, and some of the React Native frontend. I also wrote the user research questions our club leaders carried to Ghana.',
+          ],
+          stat: {
+            value: '3.8% \u2013 33.5%',
+            label: 'The reported range for postpartum depression across Ghana, from thirteen years of studies. The spread is that wide because almost nobody is counting. In Dwenase nobody was.',
+            source: 'Keku et al., Prevalence of postpartum depression in Ghana: a systematic review, Scientific Electronic Archives 17(1), 2024',
+            href: 'https://scientificelectronicarchives.org/index.php/SEA/article/view/1826',
+          },
+        },
+        {
+          heading: 'Research',
+          body: [
+            'We built the first version to have something to ask questions about. A description of an app gets you politeness. A working app in someone\u2019s hand gets you corrections.',
+            'Our club leaders took it to Dwenase and sat down with the six people who would be the ones recommending it: five midwives and a doctor, one of the midwives the clinic\u2019s mental health specialist.',
+            'They told us what the literature cannot. Low mood after birth is common here, nobody screens for it, and a tool that caught it would get used.',
+            'The United States reports 11.9% and screens for it routinely. Even there, only one mother in four with symptoms is ever diagnosed. Dwenase screens for none of it.',
+            'The first design compared the baby\u2019s size to Western supermarket fruit. That came back from the trip, and we changed it in both the Figma and the app before the RISE expo a few weeks later: ziziphus, uapaca, agbalumo, guava, tangerine, jackfruit, papaya, pineapple, watermelon.',
+            'It was a patch and we knew it. Nine entries, one a month, means the same picture for four weeks at a time. This redesign does the whole job: fifteen ranges covering weeks 1 to 40, built on what is at market in Dwenase. Ackee apple, dawadawa seed, hog plum, plantain, yam tuber.',
+          ],
+          image: {
+            maxWidth: 680,
+            src: getImagePath('/projects/nurture-nest/research-poster.jpg'),
+            badge: { kind: 'built', label: 'Implementation \u00b7 MVP' },
+            caption: 'The research poster for the first build, presented at Northeastern\u2019s RISE expo with funding from a PEAK Experience Award',
+          },
+        },
+        {
+          heading: 'Design Pillars',
+          body: [
+            'Ask for less. One question per screen, and never a question whose answer the app does not use.',
+            'No word she has to learn. If a term only makes sense to a clinician, it does not appear.',
+            'Work with the belief, not against it. Telling someone their family is wrong is a good way to lose them.',
+          ],
+          images: [
+            { src: getImagePath('/projects/nurture-nest/dev-belief-down.png'), badge: 'figma', bare: true, maxWidth: 300, caption: 'One belief a month, face down. She turns it over when she is ready to' },
+            { src: getImagePath('/projects/nurture-nest/dev-belief-up.png'), badge: 'figma', bare: true, maxWidth: 300, caption: 'Turned over. It names what people here say about sadness after birth before it says anything else' },
+          ],
+        },
+        {
+          heading: 'Features',
+          body: 'The app is four things: a home screen for the week she is in, a symptom tracker she can fill in with one tap a day, three standard screenings, and a set of readings and contacts that change with how far along she is.',
+          carouselAspect: '514 / 1085',
+          carouselBare: true,
+          carousel: [
+            { src: getImagePath('/projects/nurture-nest/dev-home.png'), badge: 'figma', caption: 'Home, at week 28. The size pill is the tappable route into the week page' },
+            { src: getImagePath('/projects/nurture-nest/dev-week-7.png'), badge: 'figma', caption: 'A week page. Fifteen entries cover weeks 1 to 40 as ranges, so there is no week without one' },
+            { src: getImagePath('/projects/nurture-nest/dev-month.png'), badge: 'figma', caption: 'A month of symptoms, so she arrives at an antenatal visit with something to show' },
+            { src: getImagePath('/projects/nurture-nest/dev-sources.png'), badge: 'figma', caption: 'Readings that change with the week she is in' },
+            { src: getImagePath('/projects/nurture-nest/dev-danger.png'), badge: 'figma', caption: 'Danger signs: a flat list, nothing to open, and the call button at both ends' },
+          ],
+          prototype: {
+            label: 'Click through the app',
+            src: 'https://www.figma.com/embed?embed_host=share&url=https%3A%2F%2Fwww.figma.com%2Fproto%2FJlOxaR8O9w6ag8YqgslkGH%2FNurture-Nest-Redesign%3Fnode-id%3D156-236048%26starting-point-node-id%3D156%253A236048%26scaling%3Dscale-down-width%26content-scaling%3Dfixed%26hide-ui%3D1',
+            link: 'https://www.figma.com/proto/JlOxaR8O9w6ag8YqgslkGH/Nurture-Nest-Redesign?node-id=156-236048&starting-point-node-id=156%3A236048',
+            width: 320,
+          },
+        },
+        {
+          heading: 'Iteration',
+          body: [
+            'The shipped onboarding asked for name, age, email and a due date typed as YYYY-MM-DD, all on one screen, before anything else was visible.',
+            'Most women here do not know a due date. So the app asks three ways: the date the health centre gave her, the date of her last period, or just how far along she feels. Whichever she can answer sets the week.',
+            'Age and email are gone. Age was collected and never used, and an email field quietly contradicts the promise that nothing leaves the phone.',
+          ],
+          image: {
+            src: getImagePath('/projects/nurture-nest/onboarding-row.png'),
+            badge: 'figma',
+            bare: true,
+            maxWidth: 680,
+            caption: 'The first run: her name, how far along she is, then a date she can actually give. Three screens, one question each',
+          },
+          prototype: {
+            label: 'Run the first-time setup',
+            src: 'https://www.figma.com/embed?embed_host=share&url=https%3A%2F%2Fwww.figma.com%2Fproto%2FJlOxaR8O9w6ag8YqgslkGH%2FNurture-Nest-Redesign%3Fnode-id%3D156-234591%26starting-point-node-id%3D156%253A234591%26scaling%3Dscale-down-width%26content-scaling%3Dfixed%26hide-ui%3D1',
+            link: 'https://www.figma.com/proto/JlOxaR8O9w6ag8YqgslkGH/Nurture-Nest-Redesign?node-id=156-234591&starting-point-node-id=156%3A234591',
+            width: 320,
+          },
+        },
+        {
+          heading: 'User Testing',
+          body: [
+            'I ran the past-results screen past a club leader who speaks English natively. She could not read it. Her words were \u201cseven of what? a mild what?\u201d',
+            'PHQ-9 gives you a number and a severity band. The band is the problem: \u201cmild\u201d has no honest ending here, because the sentence it wants is \u201cmild depression\u201d and the app had promised it does not diagnose.',
+            'So the score goes back into the thing she actually did, which was say how often she felt things. A 7 now reads \u201cA few of these feelings, some days. You scored 7 of 27, less than last time.\u201d Same information, no diagnosis, nothing to learn.',
+          ],
+          image: {
+            src: getImagePath('/projects/nurture-nest/dev-past-results.png'),
+            badge: 'figma',
+            bare: true,
+            maxWidth: 320,
+            caption: 'Past results after the rewrite. The middle line is the whole change',
+          },
+        },
+        {
+          heading: 'Handoff',
+          body: [
+            'Another team builds this, so the deliverable is a kit rather than a set of pictures. Forty-seven screens, a component library, and a palette with every colour pair measured against WCAG AA instead of eyeballed.',
+            'Body text starts at 16px, not the 14 a consumer app would use, and touch targets are 56px rather than 44. It is a modest phone, used outdoors, often one-handed.',
+            'So a screen nobody has designed yet can still be built, and still look like the rest.',
+          ],
+          imagesStack: true,
+          images: [
+            { src: getImagePath('/projects/nurture-nest/sys-contrast.png'), badge: 'figma', maxWidth: 680, caption: 'Every pair measured. inkFaint is the one tone that misses AA for body text, so it is restricted to labels and decorative marks' },
+            { src: getImagePath('/projects/nurture-nest/sys-colour.png'), badge: 'figma', maxWidth: 680, caption: 'The palette. A warm earth range replacing the Expo template blue the first build shipped with' },
+            { src: getImagePath('/projects/nurture-nest/sys-type.png'), badge: 'figma', maxWidth: 620, caption: 'The type scale, floored at 16px for body' },
+            { src: getImagePath('/projects/nurture-nest/sys-components-1.png'), badge: 'figma', maxWidth: 420, caption: 'Three of the nineteen variant sets. Every part is drawn once, then used everywhere' },
+          ],
+        },
+        {
+          heading: 'Learnings',
+          body: [
+            'The first build was not a failed product. It was the instrument that got us real answers, and almost everything worth keeping in the redesign came from something it provoked.',
+            'Designing for someone means letting them set the design language. Speaking to their concerns, in their words, was always the point of this app, and it is the part we could not reason our way to from Boston. We only got it by putting the thing in front of them.',
+            'The part I did not expect was how much of that was literally language. The screens that failed were not the ones that looked wrong. They were the ones a fluent English speaker could not parse, and I only found that by watching one person try.',
+          ],
+        },
+      ],
+    },
+    links: {
+      proto: 'https://www.figma.com/proto/JlOxaR8O9w6ag8YqgslkGH/Nurture-Nest-Redesign?node-id=156-236048&starting-point-node-id=156%3A236048',
+      deck: 'https://www.behance.net/nicololagravi2',
+    },
+  },
+  {
     id: 'jewelry-crm',
     title: 'Jewelry Store CRM',
     org: 'Independent',
@@ -697,153 +847,6 @@ export const projects = [
     },
     links: { live: 'https://tulip.co/tec-virtual-tour/' },
     featured: true,
-  },
-  {
-    id: 'nurture-nest',
-    title: 'Nurture Nest',
-    org: 'Innovators for Global Health',
-    year: '2025',
-    role: 'UX & Frontend',
-    summary:
-      'Mobile-first maternal-health app with flows for tracking, alerts, and education, designed for accessibility in rural communities.',
-    highlights: [
-      'Collaborated on UX design in Figma and React frontend.',
-      'Accessibility-first, mobile-first patterns for low-bandwidth contexts.',
-      'Presented the working prototype at Northeastern’s RISE expo, funded by a PEAK Experience Award.',
-    ],
-    tags: ['Figma', 'React', 'UX', 'Accessibility', 'Healthcare'],
-    image: getImagePath('/projects/nurture-nest/hero.jpg'),
-    accent: 'var(--accent-grad)',
-    caseStudy: {
-      subtitle: 'Maternal mental health support for rural Ghana, designed around what people already believe rather than against it.',
-      sections: [
-        {
-          heading: 'Mission',
-          body: 'Give a pregnant or new mother in rural Ghana a way to notice how she is doing, and a reason to say it out loud to someone who can help.',
-        },
-        {
-          heading: 'Context',
-          body: [
-            'Nurture Nest is a student project through Innovators for Global Health, in partnership with the Dwenase Health Centre in Ghana. Postpartum depression and anxiety are common there and care is thin. Stigma, distance and too few professionals keep most women from reaching any of it.',
-            'I was on the tech team from the start: initial planning, the UX and UI flows, some of the Figma, and some of the React Native frontend. I also wrote the user research questions our club leaders carried to Ghana.',
-          ],
-          stat: {
-            value: '3.8% \u2013 33.5%',
-            label: 'The reported range for postpartum depression across Ghana, from thirteen years of studies. The spread is that wide because almost nobody is counting. In Dwenase nobody was.',
-            source: 'Keku et al., Prevalence of postpartum depression in Ghana: a systematic review, Scientific Electronic Archives 17(1), 2024',
-            href: 'https://scientificelectronicarchives.org/index.php/SEA/article/view/1826',
-          },
-        },
-        {
-          heading: 'Research',
-          body: [
-            'We built the first version to have something to ask questions about. A description of an app gets you politeness. A working app in someone\u2019s hand gets you corrections.',
-            'Our club leaders took it to Dwenase and sat down with the six people who would be the ones recommending it: five midwives and a doctor, one of the midwives the clinic\u2019s mental health specialist.',
-            'They told us what the literature cannot. Low mood after birth is common here, nobody screens for it, and a tool that caught it would get used.',
-            'The United States reports 11.9% and screens for it routinely. Even there, only one mother in four with symptoms is ever diagnosed. Dwenase screens for none of it.',
-            'The first design compared the baby\u2019s size to Western supermarket fruit. That came back from the trip, and we changed it in both the Figma and the app before the RISE expo a few weeks later: ziziphus, uapaca, agbalumo, guava, tangerine, jackfruit, papaya, pineapple, watermelon.',
-            'It was a patch and we knew it. Nine entries, one a month, means the same picture for four weeks at a time. This redesign does the whole job: fifteen ranges covering weeks 1 to 40, built on what is at market in Dwenase. Ackee apple, dawadawa seed, hog plum, plantain, yam tuber.',
-          ],
-          image: {
-            maxWidth: 680,
-            src: getImagePath('/projects/nurture-nest/research-poster.jpg'),
-            badge: { kind: 'built', label: 'Implementation \u00b7 MVP' },
-            caption: 'The research poster for the first build, presented at Northeastern\u2019s RISE expo with funding from a PEAK Experience Award',
-          },
-        },
-        {
-          heading: 'Design Pillars',
-          body: [
-            'Ask for less. One question per screen, and never a question whose answer the app does not use.',
-            'No word she has to learn. If a term only makes sense to a clinician, it does not appear.',
-            'Work with the belief, not against it. Telling someone their family is wrong is a good way to lose them.',
-          ],
-          images: [
-            { src: getImagePath('/projects/nurture-nest/dev-belief-down.png'), badge: 'figma', bare: true, maxWidth: 300, caption: 'One belief a month, face down. She turns it over when she is ready to' },
-            { src: getImagePath('/projects/nurture-nest/dev-belief-up.png'), badge: 'figma', bare: true, maxWidth: 300, caption: 'Turned over. It names what people here say about sadness after birth before it says anything else' },
-          ],
-        },
-        {
-          heading: 'Features',
-          body: 'The app is four things: a home screen for the week she is in, a symptom tracker she can fill in with one tap a day, three standard screenings, and a set of readings and contacts that change with how far along she is.',
-          carouselAspect: '514 / 1085',
-          carouselBare: true,
-          carousel: [
-            { src: getImagePath('/projects/nurture-nest/dev-home.png'), badge: 'figma', caption: 'Home, at week 28. The size pill is the tappable route into the week page' },
-            { src: getImagePath('/projects/nurture-nest/dev-week-7.png'), badge: 'figma', caption: 'A week page. Fifteen entries cover weeks 1 to 40 as ranges, so there is no week without one' },
-            { src: getImagePath('/projects/nurture-nest/dev-month.png'), badge: 'figma', caption: 'A month of symptoms, so she arrives at an antenatal visit with something to show' },
-            { src: getImagePath('/projects/nurture-nest/dev-sources.png'), badge: 'figma', caption: 'Readings that change with the week she is in' },
-            { src: getImagePath('/projects/nurture-nest/dev-danger.png'), badge: 'figma', caption: 'Danger signs: a flat list, nothing to open, and the call button at both ends' },
-          ],
-          prototype: {
-            label: 'Click through the app',
-            src: 'https://www.figma.com/embed?embed_host=share&url=https%3A%2F%2Fwww.figma.com%2Fproto%2FJlOxaR8O9w6ag8YqgslkGH%2FNurture-Nest-Redesign%3Fnode-id%3D156-236048%26starting-point-node-id%3D156%253A236048%26scaling%3Dscale-down-width%26content-scaling%3Dfixed%26hide-ui%3D1',
-            link: 'https://www.figma.com/proto/JlOxaR8O9w6ag8YqgslkGH/Nurture-Nest-Redesign?node-id=156-236048&starting-point-node-id=156%3A236048',
-            width: 320,
-          },
-        },
-        {
-          heading: 'Iteration',
-          body: [
-            'The shipped onboarding asked for name, age, email and a due date typed as YYYY-MM-DD, all on one screen, before anything else was visible.',
-            'Most women here do not know a due date. So the app asks three ways: the date the health centre gave her, the date of her last period, or just how far along she feels. Whichever she can answer sets the week.',
-            'Age and email are gone. Age was collected and never used, and an email field quietly contradicts the promise that nothing leaves the phone.',
-          ],
-          image: {
-            src: getImagePath('/projects/nurture-nest/onboarding-row.png'),
-            badge: 'figma',
-            bare: true,
-            maxWidth: 680,
-            caption: 'The first run: her name, how far along she is, then a date she can actually give. Three screens, one question each',
-          },
-          prototype: {
-            label: 'Run the first-time setup',
-            src: 'https://www.figma.com/embed?embed_host=share&url=https%3A%2F%2Fwww.figma.com%2Fproto%2FJlOxaR8O9w6ag8YqgslkGH%2FNurture-Nest-Redesign%3Fnode-id%3D156-234591%26starting-point-node-id%3D156%253A234591%26scaling%3Dscale-down-width%26content-scaling%3Dfixed%26hide-ui%3D1',
-            link: 'https://www.figma.com/proto/JlOxaR8O9w6ag8YqgslkGH/Nurture-Nest-Redesign?node-id=156-234591&starting-point-node-id=156%3A234591',
-            width: 320,
-          },
-        },
-        {
-          heading: 'User Testing',
-          body: [
-            'I ran the past-results screen past a club leader who speaks English natively. She could not read it. Her words were \u201cseven of what? a mild what?\u201d',
-            'PHQ-9 gives you a number and a severity band. The band is the problem: \u201cmild\u201d has no honest ending here, because the sentence it wants is \u201cmild depression\u201d and the app had promised it does not diagnose.',
-            'So the score goes back into the thing she actually did, which was say how often she felt things. A 7 now reads \u201cA few of these feelings, some days. You scored 7 of 27, less than last time.\u201d Same information, no diagnosis, nothing to learn.',
-          ],
-          image: {
-            src: getImagePath('/projects/nurture-nest/dev-past-results.png'),
-            badge: 'figma',
-            bare: true,
-            maxWidth: 320,
-            caption: 'Past results after the rewrite. The middle line is the whole change',
-          },
-        },
-        {
-          heading: 'Handoff',
-          body: [
-            'Another team builds this, so the deliverable is a kit rather than a set of pictures. Forty-seven screens, a component library, and a palette with every colour pair measured against WCAG AA instead of eyeballed.',
-            'Body text starts at 16px, not the 14 a consumer app would use, and touch targets are 56px rather than 44. It is a modest phone, used outdoors, often one-handed.',
-            'So a screen nobody has designed yet can still be built, and still look like the rest.',
-          ],
-          imagesStack: true,
-          images: [
-            { src: getImagePath('/projects/nurture-nest/sys-contrast.png'), badge: 'figma', maxWidth: 680, caption: 'Every pair measured. inkFaint is the one tone that misses AA for body text, so it is restricted to labels and decorative marks' },
-            { src: getImagePath('/projects/nurture-nest/sys-colour.png'), badge: 'figma', maxWidth: 680, caption: 'The palette. A warm earth range replacing the Expo template blue the first build shipped with' },
-            { src: getImagePath('/projects/nurture-nest/sys-type.png'), badge: 'figma', maxWidth: 620, caption: 'The type scale, floored at 16px for body' },
-            { src: getImagePath('/projects/nurture-nest/sys-components-1.png'), badge: 'figma', maxWidth: 420, caption: 'Three of the nineteen variant sets. Every part is drawn once, then used everywhere' },
-          ],
-        },
-        {
-          heading: 'Learnings',
-          body: [
-            'The first build was not a failed product. It was the instrument that got us real answers, and almost everything worth keeping in the redesign came from something it provoked.',
-            'Designing for someone means letting them set the design language. Speaking to their concerns, in their words, was always the point of this app, and it is the part we could not reason our way to from Boston. We only got it by putting the thing in front of them.',
-            'The part I did not expect was how much of that was literally language. The screens that failed were not the ones that looked wrong. They were the ones a fluent English speaker could not parse, and I only found that by watching one person try.',
-          ],
-        },
-      ],
-    },
-    links: {},
   },
   {
     id: 'portfolio',
