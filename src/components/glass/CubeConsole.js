@@ -7,7 +7,6 @@ import { profile, projects } from '../../data/portfolio';
 import { games } from '../../data/games';
 import { TbArrowLeft } from './icons';
 import ProjectPage from './pages/ProjectPage';
-import CaseStudyPage from './pages/CaseStudyPage';
 import GamePage from './pages/GamePage';
 import AboutPage from './pages/AboutPage';
 import SoundToggle from './SoundToggle';
@@ -219,13 +218,9 @@ const CubeConsole = () => {
     if (page.kind === 'about') return <AboutPage />;
     if (page.kind === 'project') {
       return (
-        <ProjectPage
-          project={projects.find((p) => p.id === page.id)}
-          onOpenCaseStudy={(id) => setPage({ kind: 'case-study', id })}
-        />
+        <ProjectPage project={projects.find((p) => p.id === page.id)} />
       );
     }
-    if (page.kind === 'case-study') return <CaseStudyPage project={projects.find((p) => p.id === page.id)} />;
     if (page.kind === 'game') return <GamePage game={games.find((g) => g.slug === page.slug)} />;
     return null;
   };

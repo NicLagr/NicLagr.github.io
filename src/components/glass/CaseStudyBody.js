@@ -4,8 +4,190 @@ import { motion, AnimatePresence } from 'framer-motion';
 import ProjectVisual, { canWebGL, VisualCaption } from './ProjectVisual';
 import { TbX, TbChevronLeft, TbChevronRight, TbExternalLink, TbVolume, TbVolumeOff } from './icons';
 import MediaBadge from './MediaBadge';
+import CaseStudyIndex from './CaseStudyIndex';
 
 const ease = [0.2, 0.9, 0.25, 1];
+
+/**
+ * Zoom and pan for the lightbox.
+ *
+ * Fit-to-viewport is right for a screenshot and useless for a reference
+ * board: the component sheet is 1560x3557, so fitting it into 75vh renders
+ * 16px body text at about 3px. Scroll to zoom toward the cursor, drag to pan,
+ * double-click to reset — the same gestures as Figma, so there is nothing to
+ * learn. Transforms are written to the node directly rather than through
+ * state, for the same reason the section dim is: this updates every wheel and
+ * pointer event.
+ */
+const ZOOM_MIN = 1;
+const ZOOM_MAX = 6;
+
+function useZoomPan(resetKey) {
+  const ref = useRef(null);
+  const boxRef = useRef(null);
+  const st = useRef({ z: 1, x: 0, y: 0, dragging: false, px: 0, py: 0 });
+  const [zoomed, setZoomed] = useState(false);
+
+  const paint = () => {
+    const el = ref.current;
+    if (!el) return;
+    const { z, x, y } = st.current;
+    el.style.transform = `translate(${x}px, ${y}px) scale(${z})`;
+    el.style.cursor = z > 1 ? (st.current.dragging ? 'grabbing' : 'grab') : 'zoom-in';
+  };
+
+  const reset = () => { st.current = { ...st.current, z: 1, x: 0, y: 0 }; setZoomed(false); paint(); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { reset(); }, [resetKey]);
+
+  // Bound natively, non-passive. React registers wheel handlers as passive at
+  // the root, so an onWheel prop can never preventDefault: the page scrolls
+  // underneath and the zoom silently does nothing.
+  const onWheel = (e) => {
+    e.preventDefault();
+    const el = ref.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const s0 = st.current;
+    const next = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, s0.z * (e.deltaY < 0 ? 1.12 : 1 / 1.12)));
+    // keep the point under the cursor fixed while the scale changes
+    const cx = e.clientX - (r.left + r.width / 2);
+    const cy = e.clientY - (r.top + r.height / 2);
+    const k = next / s0.z;
+    st.current = { ...s0, z: next, x: next === 1 ? 0 : s0.x - cx * (k - 1), y: next === 1 ? 0 : s0.y - cy * (k - 1) };
+    setZoomed(next > 1);
+    paint();
+  };
+
+  const onPointerDown = (e) => {
+    if (st.current.z <= 1) return;
+    e.currentTarget.setPointerCapture?.(e.pointerId);
+    st.current = { ...st.current, dragging: true, px: e.clientX, py: e.clientY };
+    paint();
+  };
+  const onPointerMove = (e) => {
+    const s0 = st.current;
+    if (!s0.dragging) return;
+    st.current = { ...s0, x: s0.x + (e.clientX - s0.px), y: s0.y + (e.clientY - s0.py), px: e.clientX, py: e.clientY };
+    paint();
+  };
+  const onPointerUp = () => { st.current = { ...st.current, dragging: false }; paint(); };
+  const onDoubleClick = () => {
+    if (st.current.z > 1) return reset();
+    st.current = { ...st.current, z: 2.5 };
+    setZoomed(true);
+    paint();
+  };
+
+  const wheelRef = useRef(onWheel);
+  wheelRef.current = onWheel;
+  useEffect(() => {
+    const box = boxRef.current;
+    if (!box) return undefined;
+    const fn = (e) => wheelRef.current(e);
+    box.addEventListener('wheel', fn, { passive: false });
+    return () => box.removeEventListener('wheel', fn);
+  }, [resetKey]);
+
+  return {
+    ref,
+    boxRef,
+    zoomed,
+    reset,
+    handlers: { onPointerDown, onPointerMove, onPointerUp, onPointerLeave: onPointerUp, onDoubleClick },
+  };
+}
+
+/**
+ * Scroll-driven focus: the section you are reading sits at full strength and
+ * the rest recede.
+ *
+ * Written against the nearest scrollable ancestor rather than the window,
+ * because this page is rendered inside an absolutely-positioned
+ * `overflow-y-auto` div (CubeConsole), so `window.scrollY` never moves and
+ * anything bound to it would sit frozen at its initial value.
+ *
+ * Styles are written straight to the DOM inside a rAF rather than through
+ * React state. A dim ramp updates on every scroll frame, and re-rendering a
+ * page that holds a WebGL cube, a Figma iframe and three carousels at that
+ * rate drops frames on exactly the modest laptops this site should feel good
+ * on. Only `activeIndex` is state, and that changes a handful of times per
+ * page.
+ */
+const DIM_MIN = 0.28;   // how far an off-focus section fades
+const BLUR_MAX = 2.4;   // px, at full distance
+
+function scrollParentOf(node) {
+  let el = node?.parentElement;
+  while (el) {
+    const oy = getComputedStyle(el).overflowY;
+    if ((oy === 'auto' || oy === 'scroll') && el.scrollHeight > el.clientHeight) return el;
+    el = el.parentElement;
+  }
+  return null;
+}
+
+function useSectionFocus(count, enabled) {
+  const refs = useRef([]);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  useEffect(() => {
+    if (!enabled || !count) return undefined;
+    const first = refs.current.find(Boolean);
+    const scroller = scrollParentOf(first);
+    const viewportH = () => (scroller ? scroller.clientHeight : window.innerHeight);
+    let raf = 0;
+
+    const apply = () => {
+      raf = 0;
+      const h = viewportH();
+      // The focus line sits above centre: a section feels "current" while its
+      // heading is in the upper third, which is where the eye actually is.
+      const focus = h * 0.38;
+      // Once the container bottoms out, no further scrolling can bring the
+      // last section up to the focus line, so without this the final section
+      // stays dimmed and the rail never marks it read. At the bottom, the
+      // last section is what you are looking at, by definition.
+      const atBottom = scroller
+        ? scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 8
+        : window.innerHeight + window.scrollY >= document.body.scrollHeight - 8;
+      let best = 0;
+      let bestD = Infinity;
+      refs.current.forEach((el, i) => {
+        if (!el) return;
+        const r = el.getBoundingClientRect();
+        const offset = scroller ? scroller.getBoundingClientRect().top : 0;
+        const top = r.top - offset;
+        // distance from the focus line to the nearest part of the section
+        const d = top > focus ? top - focus : Math.max(0, focus - (top + r.height));
+        if (d < bestD) { bestD = d; best = i; }
+        const t = atBottom && i === refs.current.length - 1 ? 0 : Math.min(1, d / (h * 0.55));
+        el.style.opacity = String(1 - (1 - DIM_MIN) * t);
+        el.style.filter = t > 0.02 ? `blur(${(BLUR_MAX * t).toFixed(2)}px)` : 'none';
+      });
+      if (atBottom) best = refs.current.length - 1;
+      setActiveIndex((prev) => (prev === best ? prev : best));
+    };
+
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(apply); };
+    const target = scroller || window;
+    target.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    apply();
+    return () => {
+      target.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [count, enabled]);
+
+  const jump = (i) => {
+    const el = refs.current[i];
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  return { refs, activeIndex, jump };
+}
 
 /**
  * The written case study for a project: a hero band, then a few short sections
@@ -49,16 +231,27 @@ const CaseImage = ({ image, index, onOpen }) => (
   <figure className="mt-5" style={{ maxWidth: image.maxWidth || 680 }}>
     <button
       onClick={() => onOpen(index)}
-      className="relative overflow-hidden block w-full text-left group gx-selectable"
-      style={{ borderRadius: 16, background: '#05060e', border: '1px solid var(--glass-edge-soft)' }}
+      className={`relative block w-full text-left group gx-selectable${image.bare ? '' : ' overflow-hidden'}`}
+      style={image.bare
+        ? { background: 'transparent', border: 'none' }
+        : { borderRadius: 16, background: '#05060e', border: '1px solid var(--glass-edge-soft)' }}
     >
       <img
         src={image.src}
         alt={image.caption || ''}
         loading="lazy"
-        className="w-full h-auto block transition-transform duration-500 group-hover:scale-[1.02]"
+        className="w-full block transition-transform duration-500 group-hover:scale-[1.02]"
+        style={image.maxHeight
+          ? { height: image.maxHeight, objectFit: 'cover', objectPosition: 'top' }
+          : { height: 'auto' }}
         onError={hideFigure}
       />
+      {image.maxHeight && !image.bare && (
+        <span
+          className="absolute inset-x-0 bottom-0 h-20 pointer-events-none"
+          style={{ background: 'linear-gradient(180deg, transparent, rgba(3,4,10,0.9))' }}
+        />
+      )}
     </button>
     {(image.caption || image.badge) && (
       <figcaption className="mt-2 text-sm leading-relaxed" style={{ color: 'var(--ink-dim)' }}>
@@ -70,6 +263,7 @@ const CaseImage = ({ image, index, onOpen }) => (
 );
 
 const CAROUSEL_CARD_W = 220;
+const CARD_ASPECT_DEFAULT = '1080 / 1240';
 const VIDEO_CARD_W = 320;
 const CAROUSEL_COPIES = 3;
 
@@ -234,7 +428,7 @@ const CarouselChrome = ({ n, cardW, activeCaption, activeBadge, active, stepPrev
 // Hiding the non-canonical copies from the accessibility tree fixes that
 // without touching the visual scroll/click mechanics, which need all three
 // copies physically present in the DOM regardless.
-const CarouselImageCard = ({ im, i, domIndex, isActive, isCanonical, onOpen, startIndex, goToDom }) => (
+const CarouselImageCard = ({ im, i, domIndex, isActive, isCanonical, onOpen, startIndex, goToDom, aspect, bare }) => (
   <button
     onClick={() => (isActive ? onOpen(startIndex + i) : goToDom(domIndex))}
     className="flex-none gx-selectable"
@@ -249,12 +443,12 @@ const CarouselImageCard = ({ im, i, domIndex, isActive, isCanonical, onOpen, sta
     }}
   >
     <div
-      className="relative overflow-hidden"
-      style={{
+      className={bare ? 'relative' : 'relative overflow-hidden'}
+      style={bare ? { aspectRatio: aspect || CARD_ASPECT_DEFAULT } : {
         borderRadius: 16,
         background: '#05060e',
         border: '1px solid var(--glass-edge-soft)',
-        aspectRatio: '1080 / 1240',
+        aspectRatio: aspect || CARD_ASPECT_DEFAULT,
         boxShadow: isActive ? '0 20px 45px -12px rgba(0,0,0,0.55)' : 'none',
       }}
     >
@@ -262,14 +456,80 @@ const CarouselImageCard = ({ im, i, domIndex, isActive, isCanonical, onOpen, sta
         src={im.src}
         alt={isCanonical ? (im.caption || '') : ''}
         loading="lazy"
-        className="absolute inset-0 w-full h-full object-cover"
+        className={`absolute inset-0 w-full h-full ${bare ? 'object-contain' : 'object-cover'}`}
         onError={hideTile}
       />
     </div>
   </button>
 );
 
-const Carousel = ({ items, startIndex, onOpen }) => {
+/**
+ * A stat callout.
+ *
+ * One number, what it means, and where it came from. The source line is not
+ * optional: a figure in a case study is a claim, and an unattributed claim
+ * about a health outcome is worth less than no claim at all. It renders as a
+ * link when a URL is given so the reader can check it in one click.
+ */
+const StatCallout = ({ stat }) => (
+  <figure
+    className="mt-6"
+    style={{ maxWidth: 680, borderLeft: '2px solid var(--accent)', paddingLeft: '1.25rem' }}
+  >
+    <div
+      className="gx-display font-semibold tracking-[-0.02em]"
+      style={{ color: 'var(--ink)', fontSize: 'clamp(2.1rem, 4.6vw, 2.9rem)', lineHeight: 1.05 }}
+    >
+      {stat.value}
+    </div>
+    <div className="mt-2 text-[15px] leading-relaxed" style={{ color: 'var(--ink-dim)' }}>
+      {stat.label}
+    </div>
+    {stat.source && (
+      <figcaption className="gx-label mt-2.5">
+        {stat.href ? (
+          <a
+            href={stat.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 transition-colors hover:text-[var(--ink)]"
+            style={{ color: 'var(--accent)' }}
+          >
+            {stat.source} <TbExternalLink size={12} />
+          </a>
+        ) : stat.source}
+      </figcaption>
+    )}
+  </figure>
+);
+
+const SectionPrototype = ({ proto }) => (
+  <div className="mt-6" style={{ maxWidth: proto.device === false ? (proto.maxWidth || 960) : (proto.width || 340) }}>
+    <div className="flex items-center justify-between mb-3">
+      <div className="gx-label">{proto.label || 'Try the actual prototype'}</div>
+      {proto.link && (
+        <a
+          href={proto.link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="gx-label flex items-center gap-1"
+          style={{ color: 'var(--accent)' }}
+        >
+          Open in Figma <TbExternalLink size={13} />
+        </a>
+      )}
+    </div>
+    {proto.device === false
+      ? <LazyFigmaEmbed src={proto.src} height={proto.height || 'min(78vh, 760px)'} />
+      : (
+        <DeviceFrame width={proto.width || 340}>
+          <LazyFigmaEmbed src={proto.src} bare />
+        </DeviceFrame>
+      )}
+  </div>
+);
+
+const Carousel = ({ items, startIndex, onOpen, aspect, bare }) => {
   const n = items.length;
   const { trackRef, activeDom, active, goToDom, stepPrev, stepNext, goToLogical } = useLoopCarousel(n);
 
@@ -286,6 +546,8 @@ const Carousel = ({ items, startIndex, onOpen }) => {
       trackRef={trackRef}
       renderCard={(i, domIndex) => (
         <CarouselImageCard
+          aspect={aspect}
+          bare={bare}
           key={domIndex}
           im={items[i]}
           i={i}
@@ -419,7 +681,50 @@ const VideoCarousel = ({ items }) => {
 // arrow-key navigation elsewhere on the page, e.g. an open lightbox above it),
 // and it's a heavy third-party load anyway — no reason to pay either cost
 // before the visitor has actually scrolled down to it.
-const LazyFigmaEmbed = ({ src }) => {
+/**
+ * A prototype, in a phone.
+ *
+ * The embed on its own is whatever shape its container is, and Figma paints
+ * its own backdrop into everything the frame does not fill — which is why a
+ * 402x874 prototype in a 520x780 box arrived letterboxed in grey with the
+ * bottom of the screen cut off. The fix is to stop fighting it: give the
+ * iframe the screen's exact aspect ratio so the frame fills it edge to edge
+ * and there is no backdrop left to show, then draw the hardware around it in
+ * CSS. That also means the device matches the clay renders used elsewhere on
+ * the page, instead of depending on the prototype's device setting in Figma.
+ */
+const SCREEN_W = 402;
+const SCREEN_H = 874;
+const BEZEL = 11;
+
+const DeviceFrame = ({ children, width = 340 }) => {
+  const inner = width - BEZEL * 2;
+  return (
+    <div
+      style={{
+        width,
+        padding: BEZEL,
+        borderRadius: 42,
+        background: 'linear-gradient(160deg, #3a3531, #23201d 55%, #2e2a27)',
+        boxShadow: '0 30px 70px -24px rgba(0,0,0,0.75), inset 0 0 0 1px rgba(255,255,255,0.07)',
+      }}
+    >
+      <div
+        className="relative overflow-hidden"
+        style={{
+          borderRadius: 32,
+          width: inner,
+          height: Math.round((inner * SCREEN_H) / SCREEN_W),
+          background: '#000',
+        }}
+      >
+        {children}
+      </div>
+    </div>
+  );
+};
+
+const LazyFigmaEmbed = ({ src, height = 'min(80vh, 720px)', bare }) => {
   const wrapRef = useRef(null);
   const [visible, setVisible] = useState(false);
 
@@ -438,7 +743,9 @@ const LazyFigmaEmbed = ({ src }) => {
     <div
       ref={wrapRef}
       className="relative overflow-hidden"
-      style={{ borderRadius: 16, border: '1px solid var(--glass-edge-soft)', height: 'min(80vh, 720px)', background: '#05060e' }}
+      style={bare
+        ? { height: '100%', background: 'transparent' }
+        : { borderRadius: 16, border: '1px solid var(--glass-edge-soft)', height, background: '#05060e' }}
     >
       {visible && (
         <iframe
@@ -457,13 +764,25 @@ const LazyFigmaEmbed = ({ src }) => {
 // which has no hero/title of its own. The mobile project sheet already shows
 // an image and a "{year} · {org}" caption right above this component, so it
 // passes both false to avoid repeating the same image and metadata twice.
-const CaseStudyBody = ({ project, showHero = true, showMeta = true }) => {
+const CaseStudyBody = ({ project, showHero = true, showMeta = true, indexTitle }) => {
   const cs = project?.caseStudy;
   const webglReady = useMemo(() => canWebGL(), []);
   const images = useMemo(() => collectImages(cs || {}), [cs]);
   const gallery = cs?.gallery || [];
   const [lightbox, setLightbox] = useState(null); // index into images, or null
   const lightboxRef = useRef(null);
+  const zoom = useZoomPan(lightbox);
+
+  // The dim ramp is a desktop reading aid. It is switched off for anyone who
+  // asked for reduced motion, and on narrow screens where sections already
+  // fill the viewport one at a time and dimming would only make the page
+  // look broken mid-scroll.
+  const focusOn = useMemo(() => {
+    if (typeof window === 'undefined') return false;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
+    return window.matchMedia('(min-width: 1024px)').matches;
+  }, []);
+  const { refs: sectionRefs, activeIndex, jump } = useSectionFocus(cs?.sections?.length || 0, focusOn);
 
   const step = (dir) => setLightbox((i) => (i === null ? null : (i + dir + images.length) % images.length));
 
@@ -530,7 +849,15 @@ const CaseStudyBody = ({ project, showHero = true, showMeta = true }) => {
       <VisualCaption show={showVisual} />
       {showMeta && <div className="gx-label mb-8">{project.org} · {project.role} · {project.year}</div>}
 
-      <div className="space-y-8">
+      <div className="lg:grid lg:gap-14" style={{ gridTemplateColumns: '190px minmax(0, 1fr)' }}>
+        <CaseStudyIndex
+          title={indexTitle || project.title}
+          sections={cs.sections}
+          activeIndex={activeIndex}
+          onJump={jump}
+        />
+
+      <div className="space-y-16" style={{ paddingBottom: focusOn ? '42vh' : 0 }}>
         {cs.sections.map((s, i) => {
           const pairStart = imgCursor;
           if (s.images) imgCursor += s.images.length;
@@ -538,11 +865,13 @@ const CaseStudyBody = ({ project, showHero = true, showMeta = true }) => {
           if (s.carousel) imgCursor += s.carousel.length;
           const singleIdx = s.image ? imgCursor++ : null;
           return (
-            <section key={i}>
+            <section
+              key={i}
+              ref={(el) => { sectionRefs.current[i] = el; }}
+              style={{ scrollMarginTop: 88, willChange: focusOn ? 'opacity, filter' : undefined }}
+            >
               <div style={{ maxWidth: 680 }}>
-                <h2 className="gx-display text-xl font-semibold tracking-[-0.01em] mb-2.5" style={{ color: 'var(--ink)' }}>
-                  {s.heading}
-                </h2>
+                <h2 className="gx-label mb-3" style={{ color: 'var(--ink-dim)' }}>{s.heading}</h2>
                 {(Array.isArray(s.body) ? s.body : [s.body]).map((p, j) => (
                   <p key={j} className={`text-[15px] leading-relaxed${j > 0 ? ' mt-3' : ''}`} style={{ color: 'var(--ink-dim)' }}>
                     {p}
@@ -553,18 +882,29 @@ const CaseStudyBody = ({ project, showHero = true, showMeta = true }) => {
                   width each image in a 2-up grid shrinks to ~330px, too small
                   to read a screenshot's UI text on a laptop screen */}
               {s.images && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-5" style={{ maxWidth: 960 }}>
-                  {s.images.map((im, k) => (
-                    <CaseImage key={k} image={im} index={pairStart + k} onOpen={setLightbox} />
-                  ))}
-                </div>
+                s.imagesStack ? (
+                  <div style={{ maxWidth: 960 }}>
+                    {s.images.map((im, k) => (
+                      <CaseImage key={k} image={im} index={pairStart + k} onOpen={setLightbox} />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-5" style={{ maxWidth: 960 }}>
+                    {s.images.map((im, k) => (
+                      <CaseImage key={k} image={im} index={pairStart + k} onOpen={setLightbox} />
+                    ))}
+                  </div>
+                )
               )}
-              {s.carousel && <Carousel items={s.carousel} startIndex={carouselStart} onOpen={setLightbox} />}
+              {s.carousel && <Carousel items={s.carousel} startIndex={carouselStart} onOpen={setLightbox} aspect={s.carouselAspect} bare={s.carouselBare} />}
               {s.videos && <VideoCarousel items={s.videos} />}
               {s.image && <CaseImage image={s.image} index={singleIdx} onOpen={setLightbox} />}
+              {s.stat && <StatCallout stat={s.stat} />}
+              {s.prototype && <SectionPrototype proto={s.prototype} />}
             </section>
           );
         })}
+      </div>
       </div>
 
       {cs.quote && (
@@ -683,23 +1023,31 @@ const CaseStudyBody = ({ project, showHero = true, showMeta = true }) => {
               className="relative flex flex-col items-center"
               style={{ maxWidth: '90vw', maxHeight: '90vh' }}
             >
-              <motion.img
-                key={lightbox}
-                src={images[lightbox].src}
-                alt={images[lightbox].caption || ''}
-                initial={{ opacity: 0, scale: 0.96 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.96 }}
-                transition={{ duration: 0.3, ease }}
-                className="block"
-                style={{ borderRadius: 16, maxWidth: '90vw', maxHeight: '75vh', objectFit: 'contain' }}
-              />
+              <div
+                ref={zoom.boxRef}
+                className="overflow-hidden"
+                style={{ borderRadius: 16, maxWidth: '90vw', maxHeight: '78vh', touchAction: 'none' }}
+                {...zoom.handlers}
+              >
+                <img
+                  ref={zoom.ref}
+                  key={lightbox}
+                  src={images[lightbox].src}
+                  alt={images[lightbox].caption || ''}
+                  draggable={false}
+                  className="block select-none"
+                  style={{ maxWidth: '90vw', maxHeight: '78vh', objectFit: 'contain', transformOrigin: 'center', willChange: 'transform' }}
+                />
+              </div>
               {(images[lightbox].caption || images[lightbox].badge) && (
                 <p className="mt-4 text-sm leading-relaxed text-center" style={{ color: 'var(--ink-dim)', maxWidth: 640 }}>
                   <MediaBadge badge={images[lightbox].badge} />
                   {images[lightbox].caption}
                 </p>
               )}
+              <p className="mt-2 gx-label" style={{ opacity: zoom.zoomed ? 1 : 0.55 }}>
+                {zoom.zoomed ? 'Drag to pan · double-click to reset' : 'Scroll to zoom · double-click to zoom in'}
+              </p>
             </div>
           </motion.div>
         )}

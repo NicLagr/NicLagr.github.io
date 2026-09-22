@@ -1,7 +1,8 @@
 import React, { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import PageShell, { pageFadeUp } from './PageShell';
-import { TbArrowUpRight, TbCode, TbFileText } from '../icons';
+import CaseStudyBody from '../CaseStudyBody';
+import { TbArrowUpRight, TbCode } from '../icons';
 import ProjectVisual, { VisualCaption } from '../ProjectVisual';
 import sfx from '../sfx';
 import { CUBE_PALETTES } from '../cubePalettes';
@@ -35,7 +36,7 @@ const SETTINGS_FACES = [
 ];
 
 /** Dedicated project detail — the full-res view you reach from the Work menu. */
-const ProjectPage = ({ project, onOpenCaseStudy }) => {
+const ProjectPage = ({ project }) => {
   const heroRef = useRef(null);
   const [cubeReady, setCubeReady] = useState(false);
   const [cubeSize, setCubeSize] = useState(300);
@@ -138,7 +139,7 @@ const ProjectPage = ({ project, onOpenCaseStudy }) => {
   const shownCubeSize = activeSetting ? Math.round(cubeSize * 1.6) : cubeSize;
 
   return (
-    <PageShell title={project.title}>
+    <PageShell title={project.title} maxWidth={1180}>
       {project.image && project.imageFit === 'contain' ? (
         <motion.img
           ref={heroRef}
@@ -261,17 +262,8 @@ const ProjectPage = ({ project, onOpenCaseStudy }) => {
         ))}
       </motion.div>
 
-      {(hasCaseStudy || links.live || links.repo) && (
+      {(links.live || links.repo) && (
         <motion.div variants={pageFadeUp} className="flex flex-wrap gap-3">
-          {hasCaseStudy && (
-            <button
-              type="button"
-              onClick={() => { sfx.open(); onOpenCaseStudy && onOpenCaseStudy(project.id); }}
-              className={links.live ? 'gx-btn' : 'gx-btn gx-btn-primary'}
-            >
-              <TbFileText size={18} /> Read case study
-            </button>
-          )}
           {links.live && (
             <a href={links.live} target="_blank" rel="noopener noreferrer" onClick={() => sfx.open()} className="gx-btn gx-btn-primary">
               View live <TbArrowUpRight size={18} />
@@ -283,6 +275,16 @@ const ProjectPage = ({ project, onOpenCaseStudy }) => {
             </a>
           )}
         </motion.div>
+      )}
+
+      {/* The case study used to be a second page behind another click. It is
+          the substance of the project, so it lives here: overview first, then
+          keep scrolling. The hero and meta line are suppressed because the
+          page already opened with both. */}
+      {hasCaseStudy && (
+        <div id="gx-case-study" className="mt-20 pt-16" style={{ borderTop: '1px solid var(--glass-edge-soft)', scrollMarginTop: 72 }}>
+          <CaseStudyBody project={project} showHero={false} showMeta={false} indexTitle={project.title} />
+        </div>
       )}
     </PageShell>
   );
