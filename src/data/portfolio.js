@@ -982,8 +982,8 @@ export const projects = [
         {
           heading: 'Iteration',
           body: [
-            'The first pass reached for the warmer half of what I grew up with: soft shapes, a friendlier palette, more to poke at. It made the site pleasant and forgettable, and it fought the register I had already written down.',
-            'More went than arrived. A floating 3D bust on About with orbiting caption panels, a cat mascot as an easter egg, and a five-colour gradient across every card and glow. Direct feedback that it read as generic, and a little AI-generated, settled it.',
+            'The first pass reached for the warmer, friendlier side of the interfaces that inspired me: a desktop you booted into, windows to drag around, scanlines over all of it. It was nostalgic and it was a costume, copying the artifact instead of the feeling.',
+            'What survived was the part I actually wanted, console navigation, and that became the cube. More went than arrived after that: a floating 3D bust on About with orbiting caption panels, a cat mascot as an easter egg, and a five-colour gradient across every card and glow. Direct feedback that it read as generic settled it.',
             'All of it came out, down to one accent colour and the cube as the only flourish. Everything cut was a good idea on its own, which is what made them hard to lose and why writing the register down first mattered.',
             'The Toolkit chip list went too. In an age where picking up a new tool is expected, a row of technology names next to my own was doing less work than showing what I had built with them.',
           ],
