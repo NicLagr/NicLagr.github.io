@@ -240,7 +240,7 @@ export const projects = [
     },
     links: {
       proto: 'https://www.figma.com/proto/JlOxaR8O9w6ag8YqgslkGH/Nurture-Nest-Redesign?node-id=156-236048&starting-point-node-id=156%3A236048',
-      deck: 'https://www.behance.net/nicololagravi2',
+      deck: 'https://www.behance.net/gallery/256098785/Nurture-Nest-Maternal-Mental-Health-for-rural-Ghana',
     },
   },
   {
