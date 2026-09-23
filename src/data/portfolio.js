@@ -231,7 +231,7 @@ export const projects = [
         {
           heading: 'Learnings',
           body: [
-            'The first build was not a failed product. It was the instrument that got us real answers, and almost everything worth keeping in the redesign came from something it provoked.',
+            'The first build did its job. It was the instrument that got us real answers, and almost everything worth keeping in the redesign came from something it provoked.',
             'Designing for someone means letting them set the design language. Speaking to their concerns, in their words, was always the point of this app, and it is the part we could not reason our way to from Boston. We only got it by putting the thing in front of them.',
             'The part I did not expect was how much of that was literally language. The screens that failed were not the ones that looked wrong. They were the ones a fluent English speaker could not parse, and I only found that by watching one person try.',
           ],
@@ -267,105 +267,82 @@ export const projects = [
       subtitle: 'An iPad CRM and repair tracker, in daily use at a working jewelry store.',
       sections: [
         {
-          heading: 'The problem',
-          body: 'A local jewelry store was running repairs and customers on paper and memory. A piece comes in for repair and it needs a ticket, a photo, a customer attached to it, and a clear place in the queue from drop-off to pickup. That is easy to lose track of on a busy counter. They needed something a staff member could actually use mid-conversation with a customer, on an iPad, without slowing the interaction down.',
-          image: {
-            src: getImagePath('/projects/jewelry-crm/paper-ticket-redacted.jpg'),
-            caption: 'An actual repair ticket from the store, before this project. Handwritten, no photo, no searchable record (customer name redacted)',
-            maxWidth: 320,
-          },
+          heading: 'Mission',
+          body: 'Get a repair from the counter to the customer\u2019s hand without anyone having to remember where it is.',
         },
         {
-          heading: 'Scoping with the owner',
-          body: 'The store is run by my family, so I could sit down with the owner directly and scope this properly before opening Figma. I wrote out the roles who’d use it (associate, jeweler, manager), the full status pipeline from intake to picked up, the data behind a job, and a plain list of what I would not build yet: a payment gateway, a customer portal, real analytics. Cutting that early kept the first version to what the counter actually needed.',
-        },
-        {
-          heading: 'A wizard, then one page',
+          heading: 'Context',
           body: [
-            'My first wireframe split ticket creation into four steps: customer, then item, then services, then a promised date. The owner’s feedback was direct. He wanted one page, not four screens, since staff at the counter don’t have time to click through steps. I checked two things before rebuilding it, one page instead of four and landscape instead of portrait, since the iPad sits flat on the counter. Both confirmed, so intake became a single scrolling form.',
-            'He also asked for the job number to be entered manually instead of auto-generated. Their paper tickets already have their own numbers on them, and two different numbering systems on the same job would confuse the counter more than it helped. The final field still auto-generates a number if you leave it blank, but typing in their existing one is the default path.',
+            'A local jewelry store was running repairs and customers on paper and memory. A piece comes in and it needs a ticket, a photo, a customer attached to it, and a clear place in the queue.',
+            'That is easy to lose on a busy counter. It had to be usable mid-conversation with a customer standing there, on an iPad, without slowing the conversation down.',
+            'The store is run by my family, so I could scope it with the owner directly. I designed and built all of it: the UX, the interface, the data model and the backend.',
+          ],
+          image: { src: getImagePath('/projects/jewelry-crm/paper-ticket-redacted.jpg'), maxWidth: 400, caption: 'What it replaced. Their paper ticket, redacted' },
+        },
+        {
+          heading: 'Scope',
+          body: [
+            'Before opening Figma I wrote out the three roles who would use it, the full status pipeline from intake to picked up, and the data behind a job.',
+            'Then a plain list of what I would not build yet: a payment gateway, a customer portal, real analytics. Cutting those early kept the first version to what the counter actually needed.',
+          ],
+          image: { src: getImagePath('/projects/jewelry-crm/intake-flow.png'), badge: { kind: 'figma', label: 'Figma \u00b7 Flow' }, maxWidth: 680, caption: 'The intake flow, mapped before any interface existed' },
+        },
+        {
+          heading: 'Pivot',
+          body: [
+            'My first wireframe split ticket creation into four steps: customer, item, services, promised date. The owner\u2019s feedback was direct. He wanted one page, because staff at the counter do not have time to click through steps.',
+            'I checked two assumptions before rebuilding. One page instead of four, and landscape instead of portrait, since the iPad sits flat on the counter. Both confirmed, so intake became a single scrolling form.',
+            'He also asked for the job number to be typed in rather than auto-generated. Their paper tickets already carry their own numbers, and two numbering systems on one job would confuse the counter more than it helped.',
           ],
           images: [
-            {
-              src: getImagePath('/projects/jewelry-crm/process-wireframe-wizard.jpg'),
-              caption: 'Before: a four-step wizard',
-            },
-            {
-              src: getImagePath('/projects/jewelry-crm/figma-intake.png'),
-              caption: 'After: one scrolling page',
-            },
-          ],
-          image: {
-            src: getImagePath('/projects/jewelry-crm/intake-flow.png'),
-            caption: 'The single-page intake as it shipped, with the job number entered manually to match their existing paper tickets',
-          },
-        },
-        {
-          heading: 'What I built',
-          body: 'I designed and built the whole thing myself, front to back. It is a CRM and repair tracker built around a Kanban board: every job moves across columns from intake to pickup, so anyone can see the state of the shop at a glance. Creating a ticket is one page, you snap photos of the piece at drop-off, attach a customer, and it lands on the board. There is a customer directory and a global search so staff can pull someone up right from the counter.',
-          images: [
-            {
-              src: getImagePath('/projects/jewelry-crm/repair-board.png'),
-              caption: 'The repair board, tracking each job from intake to pickup',
-            },
-            {
-              src: getImagePath('/projects/jewelry-crm/customer-directory.png'),
-              caption: 'The customer directory, searchable from the counter',
-            },
+            { src: getImagePath('/projects/jewelry-crm/process-wireframe-wizard.jpg'), badge: { kind: 'figma', label: 'Figma \u00b7 Wireframe' }, caption: 'The wizard. Step 1 of 4, with three more before the job existed' },
+            { src: getImagePath('/projects/jewelry-crm/figma-intake.png'), badge: 'figma', caption: 'What replaced it. One page, landscape, everything visible at once' },
           ],
         },
         {
-          heading: 'Design and stack',
-          body: 'I designed it iPad-first, since that is where it lives, on a counter with a customer standing in front of it. Under the hood it is Next.js 15 and React 19 in TypeScript, Tailwind v4 for the interface, and Prisma for the data, with role-based logins so staff and owner each see the right things. I owned the UX, the interface, the data model, and the backend.',
-        },
-        {
-          heading: 'What iPad-first actually meant',
+          heading: 'Features',
           body: [
-            'The Figma prototype shaped the direction, but the shipped product kept moving well past it. Once real hands were on the screen in the store, rapid AI-assisted iteration and actual daily use, not just a usability session, kept surfacing small friction I hadn’t predicted.',
-            'The job number’s edit button only appeared on hover, fine with a mouse, invisible on a touchscreen with no hover state. Watching staff hunt for it, I made every edit button permanently visible. The price field started as a number input with spinner arrows that reformatted the value on every keystroke, so typing a price felt like fighting the field. I replaced it with a plain text input that only reformats once you tap away, so it types the way someone actually types a price.',
+            'A Kanban board is the home screen. Every job moves across columns from intake to pickup, so anyone can read the state of the shop at a glance.',
+            'Creating a ticket is one page: snap photos of the piece at drop-off, attach a customer, and it lands on the board. A directory and a global search let staff pull a customer up from the counter.',
+            'A status change can also send a text. Staff pick a template or write their own, and Twilio delivers it. It checks the customer\u2019s opt-in and a store-wide toggle, and logs every attempt, sent, blocked or failed, to that job\u2019s activity trail.',
           ],
-          image: {
-            src: getImagePath('/projects/jewelry-crm/process-job-detail-edit.jpg'),
-            caption: 'The shipped job detail: every edit button permanently visible, no hover state to hunt for',
-          },
+          carousel: [
+            { src: getImagePath('/projects/jewelry-crm/repair-board.png'), badge: 'figma', caption: 'The board, from intake to picked up' },
+            { src: getImagePath('/projects/jewelry-crm/customer-directory.png'), badge: 'figma', caption: 'Customer directory, searchable from the counter' },
+            { src: getImagePath('/projects/jewelry-crm/figma-reports.png'), badge: 'figma', caption: 'Reports, built for the owner rather than the counter' },
+          ],
+          prototype: { label: 'Click through the intake flow', src: 'https://www.figma.com/embed?embed_host=share&url=https%3A%2F%2Fwww.figma.com%2Fproto%2FhCZGwMAKQABnoMgIh4LDDV%2FJewelry-CRM-Prototype%3Fnode-id%3D138-389%26starting-point-node-id%3D138%253A389%26t%3D6oBdWu1ihwyIhbz2-1%26hide-ui%3D1%26scaling%3Dscale-down-width', link: 'https://www.figma.com/proto/hCZGwMAKQABnoMgIh4LDDV/Jewelry-CRM-Prototype?node-id=138-389&starting-point-node-id=138%3A389', device: false, maxWidth: 960 },
         },
         {
-          heading: 'Texting customers without guessing',
-          body: 'Status updates can also trigger a text. Staff open a job, pick a template (received, ready for pickup) or write their own, and send it, Twilio handles delivery from there. It checks the customer’s opt-in, a store-wide SMS toggle in settings, and logs every attempt, sent, blocked, or failed, to that job’s activity trail, so there is always a record of what a customer was told and when.',
-          image: {
-            src: getImagePath('/projects/jewelry-crm/process-sms-modal.jpg'),
-            caption: 'The send-text modal: pick a template, edit it, send it',
-          },
-        },
-        {
-          heading: 'A promise date that wasn’t always a promise',
+          heading: 'User Testing',
           body: [
-            'The promised pickup date started out required, which made sense until a piece needed assessment before anyone could promise a turnaround, and staff were stuck entering a placeholder date just to get past the form. The owner asked me to fix it, so I made it optional. The first pass just dropped the requirement without saying it was optional, so I added an explicit "(optional)" label, a way to clear the date, and a plain sentence on when it shows up in a customer text, replacing an amber warning box.',
-            'The completed-ticket label went through its own loop. A finished ticket first showed just the completion date, but staff also needed to see it against the original promise, so I added that back in parentheses. The first version read "Completed: [date] (was [date])," and "was" read as ambiguous enough that I changed it to "Promised."',
+            'The Figma prototype set the direction, but the shipped product kept moving past it. Real hands on the screen in the store surfaced friction I had not predicted.',
+            'The job number\u2019s edit button only appeared on hover. Fine with a mouse, invisible on a touchscreen, which has no hover state. Watching staff hunt for it, I made every edit control permanently visible.',
+            'The price field was a number input with spinner arrows that reformatted on every keystroke, so typing a price felt like fighting the field. A plain text input that reformats only once you tap away types the way people actually type prices.',
           ],
-          image: {
-            src: getImagePath('/projects/jewelry-crm/process-promised-date.jpg'),
-            caption: 'Optional, clearable, and plain about where the date goes: shown to the customer in SMS notifications',
-          },
+          image: { src: getImagePath('/projects/jewelry-crm/process-job-detail-edit.jpg'), badge: 'built', maxWidth: 680, caption: 'Job detail in the shipped app, every edit control visible without hovering' },
         },
         {
-          heading: 'In daily use',
-          body: 'This runs in a real store, and it didn’t stay static after launch. The Kanban board shipped first with a note saying drag-and-drop wasn’t implemented yet, click a card to change its status. Once the core flow was proven, I added real drag-and-drop. Search had a similar arc: results first got squeezed into the same four-column layout, confusing to scan, so I gave search its own flat list view. None of these were big rewrites, they were the kind of small correction you only find by watching someone use the thing every day.',
-          images: [
-            {
-              src: getImagePath('/projects/jewelry-crm/kanban-drag-drop.gif'),
-              caption: 'Real drag-and-drop, added once the click-to-change-status version had already proven the flow',
-            },
-            {
-              src: getImagePath('/projects/jewelry-crm/figma-reports.png'),
-              caption: 'A reports and analytics view from the Figma design, planned beyond the current build',
-            },
+          heading: 'Iteration',
+          body: [
+            'The promised pickup date started out required, which held until a piece needed assessment before anyone could promise a turnaround. Staff were entering placeholder dates to get past the form, so I made it optional.',
+            'The first pass dropped the requirement without saying so. I added an explicit "(optional)" label, a way to clear the date, and a plain sentence about when it appears in a customer text, replacing an amber warning box.',
+            'The completed-ticket label had its own loop. It read "Completed: [date] (was [date])", and "was" was ambiguous enough that I changed it to "Promised".',
           ],
+          images: [
+            { src: getImagePath('/projects/jewelry-crm/process-promised-date.jpg'), badge: 'built', caption: 'The promised date, optional and clearable, with the warning box gone' },
+            { src: getImagePath('/projects/jewelry-crm/process-sms-modal.jpg'), badge: 'built', caption: 'Texting a customer, with the template picker and the activity trail behind it' },
+          ],
+        },
+        {
+          heading: 'Learnings',
+          body: [
+            'The board shipped with a note saying drag-and-drop was not built yet, click a card to change its status. Once the core flow was proven I added real drag-and-drop. Search shipped squeezed into the same four-column layout and got its own flat list once it turned out to be unreadable.',
+            'None of those were rewrites. They are the kind of correction you only find by watching someone use the thing every day, which is the argument for putting something small into real use rather than designing until it feels finished.',
+          ],
+          image: { src: getImagePath('/projects/jewelry-crm/kanban-drag-drop.gif'), badge: 'built', maxWidth: 680, caption: 'Drag-and-drop on the board, added once the click-to-change flow had proven out' },
         },
       ],
-      figmaEmbed:
-        'https://www.figma.com/embed?embed_host=share&url=https%3A%2F%2Fwww.figma.com%2Fproto%2FhCZGwMAKQABnoMgIh4LDDV%2FJewelry-CRM-Prototype%3Fnode-id%3D138-389%26starting-point-node-id%3D138%253A389%26t%3D6oBdWu1ihwyIhbz2-1%26hide-ui%3D1%26scaling%3Dscale-down-width',
-      figmaEmbedLink: 'https://www.figma.com/proto/hCZGwMAKQABnoMgIh4LDDV/Jewelry-CRM-Prototype?node-id=138-389&starting-point-node-id=138%3A389',
     },
     links: { repo: 'https://github.com/NicLagr/Jewelry-RCM-App' },
   },
@@ -614,38 +591,73 @@ export const projects = [
       subtitle: 'A real-time 3D weather and flight visualization tool for domain scientists and aviation partners.',
       sections: [
         {
-          heading: 'The job',
-          body: 'This started as a week-long hackathon inside GE Aerospace: live weather model data on an interactive 3D globe next to real flight tracking, so people could see where a flight might hit turbulence or conditions that form contrails. It got a good reception and turned into five months of ongoing development. I was a core developer on both the UX and the frontend, writing 259 of 369 frontend commits (about 70%) across 26 merged pull requests, plus a smaller supporting role on the backend.',
+          heading: 'Mission',
+          body: 'Let someone see where a flight is going to hit weather, on a globe, while the weather is still happening.',
         },
         {
-          heading: 'Twelve conversations with the people who’d use it',
-          body: 'Most of what shaped the interface came from twelve feedback sessions over about three months with domain scientists and aviation partners, walking them through the app and watching where they got stuck. The color gradients and legends on layers like temperature and wind speed got reworked to match how scientists conventionally read that data. I cut the globe and map textures down to whichever ones tested well, and a dedicated demo mode came out of a session about what the tool needed for executive presentations.',
-        },
-        {
-          heading: 'What a meteorologist caught',
-          body: 'The globe also renders wind barbs, the small flagged arrows meteorologists use to read wind speed and direction at a glance, arranged in a grid that gets denser or sparser as you zoom. A meteorologist testing the feature in one of those sessions caught two things. The first was straightforward: the barbs were too small, and the color and outline needed more contrast to read clearly at a distance, so I fixed the size, color, and outline weight. The second was a real gap in what I knew. Wind barbs are supposed to flip which side the feathers sit on depending on hemisphere, clockwise in the Northern Hemisphere, counter-clockwise in the Southern, because that convention makes them point toward the center of a low-pressure system either way. It is how a forecaster spots a storm system at a glance. My implementation did not do this. I had not known the rule existed, so I had built one version for both hemispheres. That is exactly what testing with a real meteorologist is for, catching a domain error I did not know to look for on my own. I fixed the orientation logic, and it mattered beyond just being correct: getting it wrong in front of an actual meteorologist during a customer demo would have cost real credibility.',
-        },
-        {
-          heading: 'Multiple ways to look at the same data',
-          body: 'Scientists needed to see the data differently depending on the task, so the app has three views on the same underlying model: an interactive 3D globe, a flattened world map, and a zoomed regional view. I also designed a Compare mode, a toggle in the layer manager that splits the screen into two independent panels, each with its own layer, palette, and time control, so someone can put temperature next to wind speed, or the same layer at two different times, side by side.',
-        },
-        {
-          heading: 'A quick bar and a deep end',
-          body: 'A domain scientist tuning a model needs different things than someone checking today’s turbulence forecast, so I split the layer system into two tiers. A quick bar gives one-click access to the layers people reach for constantly: temperature, winds, turbulence, contrails, aerosols, satellite. Underneath sits a full Layer Manager, where each active layer gets its own opacity, color palette, and min/max range, plus a legend chip so several layers stack and read at once. The wind particle layer also gets its own settings panel, speed, trail length, line width, density, color mode, response, for people who wanted to tune the animation instead of just switching it on.',
-        },
-        {
-          heading: 'The wind particle system',
+          heading: 'Context',
           body: [
-            'The particle system runs on the GPU: thousands of streamlines animated across the globe with custom WebGL and GLSL shaders, particle position and velocity carried in GPU framebuffers instead of JavaScript arrays. It needed to be that fast for a UX reason, not a performance flex: at a continent-wide zoom, thousands of particles should read as one coherent flow, but the same count zoomed into a single airport looks sparse and broken. Zoom-adaptive density fixes that, scaling particle count by the square of the zoom ratio so the visual density stays constant.',
-            'Some of the hardest bugs in that system never threw an error. A GPU resource would get destroyed on window resize, but Cesium kept drawing with it every frame, crashing intermittently until I reproduced it by firing synthetic resize events. Another time, a performance change that should have been free (a smaller intermediate texture) silently stopped rendering anything, because Cesium does not auto-derive a draw command’s viewport from the texture it is bound to. Both taught me to trust browser reproduction over static analysis for GPU bugs.',
+            'This began as a week-long hackathon inside GE Aerospace: live weather model data on an interactive 3D globe next to real flight tracking, so people could see where a flight might meet turbulence or the conditions that form contrails.',
+            'It got a good reception and turned into five months of development. I was a core developer on the UX and the frontend, and a smaller supporting role on the backend.',
+            'Internal GE Aerospace work, so this is an account of the design and the engineering without screenshots or internal names.',
+          ],
+          stat: {
+            value: '259 of 369',
+            label: 'frontend commits, about 70 percent, across 26 merged pull requests. I owned the research, the interface and the rendering underneath it.',
+          },
+        },
+        {
+          heading: 'Research',
+          body: [
+            'Most of what shaped the interface came from twelve feedback sessions over about three months with domain scientists and aviation partners, walking them through the app and watching where they got stuck.',
+            'Colour gradients and legends on layers like temperature and wind speed were reworked to match how scientists conventionally read that data. I cut the globe and map textures down to the ones that tested well.',
+            'A dedicated demo mode came straight out of a session about what the tool needed for executive presentations.',
           ],
         },
         {
-          heading: 'A shared design system, and where it landed',
+          heading: 'User Testing',
           body: [
-            'The visual design didn’t start from a blank page. A sibling team had already built Phase, a design system in Figma, color and spacing decisions, component patterns, but only as static mockups, nothing in code. I built it into a working Vue component library, extending it to 11+ real components (drawers, legends, sliders, a flight panel, a vertical profile chart) so both apps shared one visual language. I also moved raster tile shading (color ramps, opacity, thresholds) into the browser, decoding tiles to raw pixel data and painting them through a palette lookup table, so changing how a layer looks is instant with no extra network requests.',
-            'By the time I moved on, it had three view modes, a compare mode, 63 renderable weather variables, and a repeat wind query down from 6 seconds to 10 to 13 milliseconds. It ran in real demos for international airlines, and it’s the project that best shows research, design, and engineering working as one thing.',
+            'The globe renders wind barbs, the small flagged arrows meteorologists use to read wind speed and direction at a glance, in a grid that thickens or thins as you zoom.',
+            'A meteorologist testing the feature caught two things. The first was straightforward: the barbs were too small, and the colour and outline needed more contrast to read at a distance.',
+            'The second was a gap in what I knew. Wind barbs flip which side the feathers sit on depending on hemisphere, clockwise in the north, counter-clockwise in the south, so they point toward the centre of a low-pressure system either way. It is how a forecaster spots a storm at a glance.',
+            'I had not known the rule existed, so I had built one version for both hemispheres. That is what testing with a real meteorologist is for: catching a domain error I did not know to look for. Getting it wrong in front of one during a customer demo would have cost real credibility.',
           ],
+        },
+        {
+          heading: 'Features',
+          body: [
+            'Scientists needed to see the data differently depending on the task, so there are three views on the same model: an interactive 3D globe, a flattened world map, and a zoomed regional view.',
+            'Compare mode splits the screen into two independent panels, each with its own layer, palette and time control, so someone can put temperature beside wind speed, or one layer at two different times.',
+            'The layer system is two tiers. A quick bar gives one-click access to what people reach for constantly. Underneath sits a full Layer Manager, where each active layer carries its own opacity, palette, range and legend chip so several stack and still read.',
+          ],
+        },
+        {
+          heading: 'Architecture',
+          body: [
+            'The particle system runs on the GPU: thousands of streamlines animated across the globe with custom WebGL and GLSL shaders, position and velocity carried in framebuffers rather than JavaScript arrays.',
+            'It had to be that fast for a design reason rather than a performance flex. At continent-wide zoom, thousands of particles read as one coherent flow; the same count over a single airport looks sparse and broken. Density scales by the square of the zoom ratio so the visual density holds constant.',
+            'The hardest bugs there never threw an error. A GPU resource would be destroyed on window resize while Cesium kept drawing with it every frame, crashing intermittently until I reproduced it by firing synthetic resize events.',
+            'Another time a change that should have been free, a smaller intermediate texture, silently stopped rendering anything, because Cesium does not derive a draw command\u2019s viewport from the texture bound to it. Both taught me to trust browser reproduction over static analysis for GPU bugs.',
+          ],
+        },
+        {
+          heading: 'Design System',
+          body: [
+            'The visual design did not start from a blank page. A sibling team had built Phase, a design system in Figma, with colour, spacing and component patterns, but only as static mockups with nothing in code.',
+            'I built it into a working Vue component library and extended it to more than eleven real components, drawers, legends, sliders, a flight panel, a vertical profile chart, so both apps shared one visual language.',
+            'I also moved raster tile shading into the browser, decoding tiles to raw pixel data and painting them through a palette lookup table, so changing how a layer looks is instant with no extra network requests.',
+          ],
+        },
+        {
+          heading: 'Learnings',
+          body: [
+            'By the time I moved on it had three view modes, a compare mode and 63 renderable weather variables, and it ran in real demos for international airlines.',
+            'It is the project that best shows research, design and engineering as one job rather than three. The meteorologist is the reason: no amount of care on my side would have found that bug, because I did not know the rule was there to break.',
+          ],
+          stat: {
+            value: '6s to 13ms',
+            label: 'A repeat wind query, after moving tile shading into the browser. Roughly 500 times faster, and the difference between a tool you demo and a tool you use.',
+          },
         },
       ],
     },
@@ -676,31 +688,58 @@ export const projects = [
       subtitle: 'A SaaS tool airlines use to weigh emissions-reduction tradeoffs across their fleet.',
       sections: [
         {
-          heading: 'The brief',
-          body: 'GE Aerospace wanted a way for airlines to evaluate emissions-reduction tradeoffs (SAF fuel targets, carbon pricing under CORSIA, scope 3 emissions, how fast a fleet upgrades) and see how they compare against a baseline plan. I designed the first prototype in Figma before any of it existed as code, then built it in Vue 3 and TypeScript with a UK-based engineering team.',
+          heading: 'Mission',
+          body: 'Let an airline see what a decision about its fleet costs, in emissions and in money, before it makes it.',
         },
         {
-          heading: 'Designing every page before writing a line of code',
-          body: 'I designed the Figma mockups for all of SIGNPOST’s primary pages myself: a home dashboard with a live emissions and regulation news feed and key metrics, the scenario-comparison view, and the rest of the core screens. They had to align with Phase, the design system shared across GE Aerospace Carbon Solutions’ apps, so I revised them against feedback from the product manager, a data scientist, and the SaaS team’s UX lead before any of it became code. I also brought AI-assisted tools, Figma Make, Claude Code, GitHub Copilot, into the handoff to working Vue components, cutting revision rounds from 3 or 4 down to 1 or 2.',
-        },
-        {
-          heading: 'Regular check-ins, and a prototype demoed wide',
-          body: 'Design here wasn’t a solo pass. I ran regular sessions with the product manager and other stakeholders as the app took shape, and once we had a fast prototype we demoed it to a wider group beyond the core team. That wider round of demos is where most of the rough edges got caught.',
-        },
-        {
-          heading: 'Designing the comparison view',
-          body: 'The compare feature let someone put scenarios up against the baseline and see emissions and cost outcomes side by side, as charts and a data table, so the tradeoffs read clearly at a glance or in exact numbers. How many scenarios you could compare at once wasn’t answered anywhere in the ticket, so I raised it with the product stakeholder. We agreed on a cap for the first release, a practical scope call rather than a user-tested one, with the baseline included automatically. Past the cap, checkboxes grayed out but stayed visible, so people could see what they couldn’t select instead of watching options disappear. I encoded the limits as named constants so the interface, validation, and tests all reference one source of truth.',
-        },
-        {
-          heading: 'Two engineering guardrails',
+          heading: 'Context',
           body: [
-            'Every comparison depends on exactly one baseline scenario existing, so once the table had row-level actions (inspect, edit, duplicate, delete), the baseline could never be deleted or duplicated away. Disabling those buttons in the interface only holds if every future entry point remembers to check, so I pushed the guard into the state layer and wrote tests that assert it fires.',
-            'Partway through, the product direction renamed the app’s core term across navigation, routes, components, and types. I split that into two smaller pull requests instead of one large rewrite, running the full test suite between each step, so I caught breakage early instead of at the end of a riskier single change.',
+            'GE Aerospace wanted a way for airlines to weigh emissions-reduction tradeoffs: SAF fuel targets, carbon pricing under CORSIA, scope 3 emissions, how fast a fleet upgrades, all measured against a baseline plan.',
+            'I designed the first prototype in Figma before any of it existed as code, then built it in Vue 3 and TypeScript with a UK-based engineering team.',
+            'Internal GE Aerospace work, so this is an account of the decisions without screenshots or internal names.',
           ],
         },
         {
-          heading: 'What it taught me',
-          body: 'This is the clearest example I have of owning something from a Figma file to a shipped product, and of knowing when to ask instead of guess. Design against real feedback, decide with input, and put the rules that matter where they can’t be bypassed: that’s the approach I bring to anything mixing interface decisions with business rules.',
+          heading: 'Design System',
+          body: [
+            'I designed the Figma mockups for every primary page: a home dashboard with a live emissions and regulation feed and key metrics, the scenario-comparison view, and the rest of the core screens.',
+            'They had to align with Phase, the design system shared across GE Aerospace Carbon Solutions, so I revised them against feedback from the product manager, a data scientist and the SaaS team\u2019s UX lead before any of it became code.',
+            'I brought Figma Make, Claude Code and GitHub Copilot into the handoff from mockup to working Vue components.',
+          ],
+          stat: {
+            value: '3 or 4 rounds down to 1 or 2',
+            label: 'Revision rounds between a Figma page and a working Vue component, after AI-assisted handoff. The design did not change; the distance between design and code did.',
+          },
+        },
+        {
+          heading: 'Iteration',
+          body: [
+            'Design here was not a solo pass. I ran regular sessions with the product manager and other stakeholders as the app took shape.',
+            'Once we had a fast prototype we demoed it to a wider group beyond the core team. That wider round is where most of the rough edges got caught.',
+          ],
+        },
+        {
+          heading: 'Features',
+          body: [
+            'Compare puts scenarios against the baseline and shows emissions and cost outcomes side by side, as charts and as a data table, so the tradeoff reads at a glance or in exact numbers.',
+            'How many scenarios you could compare at once was not answered anywhere in the ticket, so I raised it with the product stakeholder. We agreed a cap for the first release, a practical scope call rather than a user-tested one, with the baseline included automatically.',
+            'Past the cap, checkboxes grey out but stay visible, so people can see what they cannot select instead of watching options disappear. I encoded the limits as named constants so the interface, the validation and the tests all read one source of truth.',
+          ],
+        },
+        {
+          heading: 'Architecture',
+          body: [
+            'Every comparison depends on exactly one baseline scenario existing. Once the table had row-level actions, inspect, edit, duplicate, delete, the baseline could never be deleted or duplicated away.',
+            'Disabling those buttons in the interface only holds if every future entry point remembers to check, so I pushed the guard into the state layer and wrote tests that assert it fires.',
+            'Partway through, the product direction renamed the app\u2019s core term across navigation, routes, components and types. I split that into two smaller pull requests rather than one rewrite, running the full suite between each, so breakage surfaced early instead of at the end.',
+          ],
+        },
+        {
+          heading: 'Learnings',
+          body: [
+            'This is the clearest example I have of owning something from a Figma file to a shipped product, and of knowing when to ask instead of guess.',
+            'Design against real feedback, decide with input, and put the rules that matter where they cannot be bypassed. That is the approach I bring to anything mixing interface decisions with business rules.',
+          ],
         },
       ],
     },
@@ -855,7 +894,7 @@ export const projects = [
     year: '2026',
     role: 'Design & Engineering',
     summary:
-      'I wanted this portfolio to feel like something you pick up and play with. I grew up on game consoles, and what stayed with me was how their menus made moving around feel alive. So I built everything around a single glass object you can turn and open, tuned to feel calm, tactile, and a little curious. It’s my attempt to show, not tell, how I think software should feel to use.',
+      'I grew up in awe of console interfaces, and what stayed with me was how much a single object could hold. So this portfolio is one glass object you turn and open rather than a page you scroll, tuned to feel otherworldly but not cold. It is my attempt to show, not tell, how I think software should feel to use.',
     highlights: [
       'Designed a single interaction model, a glass cube whose faces map to the site’s sections, as an alternative to a typical scrolling homepage, with an accessible fallback for reduced motion and lower-powered devices.',
       'Rebuilt the information hierarchy after a critical self-review: cut a 3D avatar, a decorative color system, and a skills-chip list that read as generic, and rewrote case-study copy across the site for a reader skimming in under two minutes.',
@@ -871,20 +910,101 @@ export const projects = [
       subtitle: 'A portfolio built as a single glass object you can turn and open.',
       sections: [
         {
-          heading: 'The idea',
-          body: 'I grew up on game console menus, and what stuck with me was how much a single object could hold. Turn a menu, and a whole different set of options appears, instead of paging through flat screens. I wanted this portfolio to work the same way, so instead of a typical scrolling homepage, everything routes through one glass object you can turn and open. Each face maps to a section, Work, About, Play, Contact, and clicking or dragging is the entire navigation model.',
+          heading: 'Mission',
+          body: 'Make a portfolio you move through like an object, rather than a page you scroll.',
         },
         {
-          heading: 'Building it to work for everyone',
-          body: 'A 3D cube console is delightful on a laptop with a GPU and full motion, and a bad idea for anyone on a low-powered device, without WebGL, or who has motion sensitivity turned on. So the site checks for prefers-reduced-motion and WebGL support before ever loading the cube, and falls back to a plain scrolling page with the same content and section order. Nobody gets a degraded version of the information, just a different way of moving through it.',
+          heading: 'Context',
+          body: [
+            'I grew up in awe of console interfaces. The GameCube and PlayStation menus were ethereal and otherworldly. The Wii, 3DS and Wii U were welcoming and comfy, a second home to sit in.',
+            'They had character, and they showed me what interface can do beyond working: what it can make you feel, what it can express, where it can make you feel you are.',
+            'That is the part of this work I care about most, so I wanted the site to carry it rather than describe it. Screenshots argue that I can make things. An interface you move through argues it directly, and it can only do that if it moves, responds, and has a register of its own.',
+            'So this is not a scrolling homepage. Everything routes through one glass object you turn and open, and each face is a section.',
+          ],
         },
         {
-          heading: 'Cutting what didn’t earn its place',
-          body: 'The first version had more going on: a floating 3D bust on the About page with orbiting caption panels, a cat mascot as an easter egg, and a five-color gradient aesthetic across every card and glow effect. After sitting on it for a while, and after direct feedback that it read as generic and a little AI-generated, I cut all of it, the bust, the mascot, most of the decorative gradients, down to one signature accent color and the cube itself as the one flourish. I also pulled an entire Toolkit chip list off the About page. In an age where picking up a new tool is expected, a list of technology names next to my name was doing less work than just showing what I’ve actually built with them.',
+          heading: 'References',
+          body: [
+            'The GameCube boot menu is a rotating cube you aim at. Everything lives on its faces and turning it is the navigation, which is the whole interaction this site is built on.',
+            'The XMB gave the backdrop: a deep indigo field with a slow wave behind it, and the sense of space around the object.',
+            'The Wii and 3DS menus gave the pace, the rounded shapes and the sound. I took the tempo from them without taking the warmth.',
+          ],
+          images: [
+            { src: getImagePath('/projects/portfolio/ref-gamecube.gif'), maxWidth: 440, caption: 'Nintendo GameCube boot menu, 2001. Four options on the edges of a turning translucent cube, aimed by direction' },
+          ],
         },
         {
-          heading: 'Treating the site as its own case study',
-          body: 'Once the content was in place, I ran the site through a round of user research: a review simulating a hiring manager scanning 150 portfolios in 90 seconds each, checked against specific criteria like time-to-impact and process legibility. That surfaced real problems. A desktop hero hid my name and role behind a blind click, and project highlights read as pure tech stack with no visible design judgment. I rewrote both. The hero now shows who I am before asking for a click, and highlights across the two most engineering-heavy projects now lead with the design decisions I made, not just the tools I used to build them.',
+          heading: 'Planning',
+          body: [
+            'The references are in the file with what each one is for, rather than as a wall of images. A moodboard records a feeling; this had to record a decision.',
+            'From there: the interaction map, the five people the site is for, and the three levels the cube has to support.',
+          ],
+          image: { src: getImagePath('/projects/portfolio/plan-flow.png'), badge: { kind: 'figma', label: 'Figma \u00b7 Planning' }, maxWidth: 760, caption: 'References, the interaction map, and the five people the site is for' },
+        },
+        {
+          heading: 'Design Pillars',
+          body: [
+            'Awe over comfort. A portfolio is not something anyone opens a thousand times the way they boot a home console, so it does not need to earn that kind of familiarity. It gets one good look, maybe a few, and awe does more for that than comfort would.',
+            'Calm, so the strangeness does not turn cold. The tuning keeps the eerie side from tipping into hostile, so the site reads as considered rather than just odd. It is a different calm from the Wii\u2019s: the stillness of a room you are not at home in yet, rather than the comfort of one you know.',
+            'Tactile. Everything answers when you touch it: the cube turns under a drag, a face ticks as you aim it, and picking something dives through the glass rather than cutting to it.',
+          ],
+        },
+        {
+          heading: 'Features',
+          body: [
+            'Three levels, and Back steps out one at a time. Aim a face on the cube. Open it, and a short menu renders inside the glass. Pick an item and it dives through the face into a full-res page.',
+            'Work, About, Play and Contact are aimed by direction rather than picked off a list, because there is no nav bar anywhere on this site. About is the one face that skips the menu and goes straight to a page.',
+            'A 3D console is a bad idea for anyone on a weak device, without WebGL, or with motion sensitivity on. The site checks all three before it ever loads the cube and falls back to a plain scrolling page with the same content in the same order. Nobody gets less information, just a different way through it.',
+          ],
+          imagesStack: true,
+          images: [
+            { src: getImagePath('/projects/portfolio/wire-level1.png'), badge: { kind: 'figma', label: 'Figma \u00b7 Wireframe' }, maxWidth: 760, caption: 'Level 1. Faces drawn unfolded for clarity, but on screen they are sides of the cube, aimed by direction' },
+            { src: getImagePath('/projects/portfolio/wire-level2.png'), badge: { kind: 'figma', label: 'Figma \u00b7 Wireframe' }, maxWidth: 760, caption: 'Level 2. The menu renders inside the glass. There is no list screen between the cube and a page' },
+            { src: getImagePath('/projects/portfolio/wire-level3.png'), badge: { kind: 'figma', label: 'Figma \u00b7 Wireframe' }, maxWidth: 760, caption: 'Level 3. Whatever the menu pointed at: a project, a game, or About' },
+          ],
+        },
+        {
+          heading: 'Design System',
+          body: [
+            'One ink at three opacities rather than three greys, so text recedes without changing colour. Glass is white over the backdrop rather than a flat fill, which is why it picks up whatever is behind it.',
+            'A single mint accent, so the site has a colour instead of a palette. Radii and spacing sit on a 4px base, and body text has a floor.',
+          ],
+          image: { src: getImagePath('/projects/portfolio/plan-foundations.png'), badge: 'figma', maxWidth: 740, caption: 'The tokens the build works from, with the exact values rather than an impression of them' },
+        },
+        {
+          heading: 'Components',
+          body: [
+            'The parts are specified rather than drawn as finished screens. That is deliberate: the front door is a moving object, and a flat frame of it would be a picture of something this site is not.',
+            'So the file describes the pieces exactly and lets the wireframes carry the structure, which between them say more than a hi-fi mock of a cube could.',
+          ],
+          image: { src: getImagePath('/projects/portfolio/plan-components.png'), badge: 'figma', maxWidth: 740, caption: 'Buttons, chips, provenance badges, index rows, stat callouts and project cards, each a variant set' },
+        },
+        {
+          heading: 'Iteration',
+          body: [
+            'The first pass reached for the warmer half of what I grew up with: soft shapes, a friendlier palette, more to poke at. It made the site pleasant and forgettable, and it fought the register I had already written down.',
+            'More went than arrived. A floating 3D bust on About with orbiting caption panels, a cat mascot as an easter egg, and a five-colour gradient across every card and glow. Direct feedback that it read as generic, and a little AI-generated, settled it.',
+            'All of it came out, down to one accent colour and the cube as the only flourish. Everything cut was a good idea on its own, which is what made them hard to lose and why writing the register down first mattered.',
+            'The Toolkit chip list went too. In an age where picking up a new tool is expected, a row of technology names next to my own was doing less work than showing what I had built with them.',
+          ],
+        },
+        {
+          heading: 'Simulated Testing',
+          body: [
+            'There was nobody to test this on yet, so I tried an experiment: I had an AI play a hiring manager scanning 150 portfolios at 90 seconds each, scoring against criteria I set, like time to impact and whether the process behind a project was legible.',
+            'I wanted to know whether that could do useful work in the stage before a real user, when the thing is too rough to put in front of anyone and you still want a reason to change it.',
+            'It found two real problems. The desktop hero hid my name and role behind a blind click, and project highlights read as pure tech stack with no visible design judgment.',
+            'The hero now says who I am before asking for a click, and the highlights on the two most engineering-heavy projects lead with decisions instead of tools.',
+            'It catches the obvious things early, which is what I asked of it. Watching a real person struggle is a different instrument, and I would want that before anything important shipped.',
+          ],
+          image: { src: getImagePath('/projects/portfolio/wire-casestudy.png'), badge: { kind: 'figma', label: 'Figma \u00b7 Wireframe' }, maxWidth: 760, caption: 'The reading layout that came out of it: an index rail, one column, and inactive sections receding so the one you are on holds attention' },
+        },
+        {
+          heading: 'Learnings',
+          body: [
+            'Naming the feeling first made every later decision easy. Once "otherworldly, but not cold" was written down, the bust and the mascot and the five-colour gradient were obviously wrong, and cutting them took an afternoon instead of an argument.',
+            'The register I landed on is a quieter thing than the consoles that started it. Not the comfort of a room you know, more the stillness of one you are not fully at home in yet.',
+          ],
         },
       ],
     },
