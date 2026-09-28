@@ -752,11 +752,11 @@ export const projects = [
     year: '2025',
     role: 'Primary Developer',
     summary:
-      'Real-time monitoring and visualization app built to complement live tours of the Tulip Experience Center for 200+ guests and executives.',
+      'Real-time monitoring and visualization app built to complement live tours of the Tulip Experience Center for 200+ guests and executives, now a permanent fixture in the Center’s Mission Control room.',
     highlights: [
       'Owned the interface end to end (visual design, data wiring, and deployment) for a live global-activity dashboard, drawing on mission-control layouts and Shopify’s Black Friday globe for scale and feel.',
       'React + Node/Express front to back, backed by AWS Redshift; Helm + Argo CD on Kubernetes cut deploy time 60% at 99.5% uptime.',
-      'Vault-managed secrets and TLS via cert-manager, running in production during live executive tours.',
+      'Vault-managed secrets and TLS via cert-manager; installed permanently in the Tulip Experience Center’s Mission Control room at Tulip’s Somerville HQ.',
     ],
     tags: ['React', 'Node.js', 'Redshift', 'Kubernetes', 'Argo CD', 'AWS'],
     image: getImagePath('/projects/mission-control/hero-globe.jpg'),
@@ -788,7 +788,10 @@ export const projects = [
         },
         {
           heading: 'Seeing it in use',
-          body: 'I always expected to reach an MVP. I did not expect to first see it running live in a LinkedIn post from Hannover Messe, on the screen behind Tulip’s CEO as he talked with Bain about the company’s reach. I built it mostly alone as a student, and that is where I first saw it in the wild. It is still one of the things I am most proud of.',
+          body: [
+            'I always expected to reach an MVP. I did not expect to first see it running live in a LinkedIn post from Hannover Messe, on the screen behind Tulip’s CEO as he talked with Bain about the company’s reach. I built it mostly alone as a student, and that is where I first saw it in the wild.',
+            'It is still running. The dashboard lives permanently in the Tulip Experience Center’s Mission Control room at the Somerville headquarters, which is where tours meet it now. Something I built as a co-op outlasted the co-op, and that is the part I am most proud of.',
+          ],
         },
       ],
       gallery: [
