@@ -1,4 +1,5 @@
 import React, { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CUBE_PALETTES } from './cubePalettes';
 import * as cubeSettings from './cubeSettings';
@@ -11,6 +12,10 @@ import GamePage from './pages/GamePage';
 import AboutPage from './pages/AboutPage';
 import SoundToggle from './SoundToggle';
 import sfx from './sfx';
+import { ROUTES, deriveRoute } from '../../routes';
+
+// which face's cube-menu a given open/back-target face path corresponds to
+const FACE_PATH = { work: ROUTES.work, play: ROUTES.play, contact: ROUTES.contact };
 
 const CubeNavigator = lazy(() => import('./CubeNavigator'));
 
@@ -38,13 +43,25 @@ const baseSize = () => {
  */
 const CubeConsole = () => {
   const [size] = useState(baseSize);
-  // click-to-start is always the entry (independent of sound); sfx.start() just
-  // no-ops audio when muted, so the power-on ritual is the same either way
-  const [started, setStarted] = useState(false);
+  const location = useLocation();
+  const params = useParams();
+  const navigate = useNavigate();
+  // click-to-start is always the entry for an organic `/` visit; a fresh load of
+  // any other path (a shared project/case-study link) skips the ritual entirely
+  // and renders straight into that content — sfx.start() just no-ops audio when
+  // muted, so the power-on ritual is otherwise the same either way
+  const [started, setStarted] = useState(() => location.pathname !== ROUTES.home);
   const handleStart = useCallback(() => { setStarted(true); sfx.start(); }, []);
   const [highlight, setHighlight] = useState(null); // which face is aimed/hovered (null = none)
-  const [active, setActive] = useState(null); // face showing a cube menu, or null
-  const [page, setPage] = useState(null);      // { kind:'project'|'game'|'about', id?/slug? }
+  // `active` (face showing a cube menu) and `page` (dedicated page open, if any)
+  // are derived from the URL rather than held as their own state — the URL is
+  // the one source of truth, so Back/Forward just work for free and there's no
+  // two-way sync to get wrong between "I just navigated" and "the location
+  // changed underneath me."
+  const { face: active, page, caseStudy } = useMemo(
+    () => deriveRoute(location.pathname, params),
+    [location.pathname, params.id, params.slug]
+  );
   const [sel, setSel] = useState(0);           // selected entry index within a cube menu
   // skin + motion chosen on the "This Portfolio" settings cube (shared + persisted)
   const [paletteIdx, setPaletteIdx] = useState(cubeSettings.getPaletteIdx());
@@ -58,9 +75,11 @@ const CubeConsole = () => {
 
   const activeRef = useRef(active);
   const pageRef = useRef(page);
+  const caseStudyRef = useRef(caseStudy);
   const selRef = useRef(sel);
   useEffect(() => { activeRef.current = active; }, [active]);
   useEffect(() => { pageRef.current = page; }, [page]);
+  useEffect(() => { caseStudyRef.current = caseStudy; }, [caseStudy]);
   useEffect(() => { selRef.current = sel; }, [sel]);
   useEffect(() => { setSel(0); }, [active]); // reset selection when entering a face
 
@@ -103,18 +122,23 @@ const CubeConsole = () => {
   const open = useCallback((id) => {
     if (!id) return; // nothing aimed yet
     sfx.open();
-    if (HAS_CUBE_MENU[id]) setActive(id);
-    else setPage({ kind: 'about' }); // about is the only page-direct face
-  }, []);
+    if (HAS_CUBE_MENU[id]) navigate(FACE_PATH[id]);
+    else navigate(ROUTES.about); // about is the only page-direct face
+  }, [navigate]);
 
   // step out one level: case study → its project, page → cube menu, cube menu → root
   const back = useCallback(() => {
     sfx.back();
     const p = pageRef.current;
-    if (p && p.kind === 'case-study') { setPage({ kind: 'project', id: p.id }); return; }
-    if (p) setPage(null);
-    else setActive(null);
-  }, []);
+    if (caseStudyRef.current && p) { navigate(ROUTES.project(p.id)); return; }
+    if (p) {
+      if (p.kind === 'project') navigate(ROUTES.work);
+      else if (p.kind === 'game') navigate(ROUTES.play);
+      else navigate(ROUTES.home); // about has no menu level to step back to
+      return;
+    }
+    if (activeRef.current) navigate(ROUTES.home);
+  }, [navigate]);
 
   const onHotspot = useCallback((action) => {
     if (!action) return;
@@ -122,11 +146,11 @@ const CubeConsole = () => {
     if (action.type === 'link') {
       window.open(action.url, action.url.startsWith('mailto') ? '_self' : '_blank', 'noopener');
     } else if (action.type === 'project') {
-      setPage({ kind: 'project', id: action.id });
+      navigate(ROUTES.project(action.id));
     } else if (action.type === 'game') {
-      setPage({ kind: 'game', slug: action.slug });
+      navigate(ROUTES.game(action.slug));
     }
-  }, []);
+  }, [navigate]);
 
   // focus the page's scroll container so arrow/space/PageDown scroll it
   const pageScrollRef = useRef(null);
@@ -134,8 +158,18 @@ const CubeConsole = () => {
     if (page && pageScrollRef.current) {
       pageScrollRef.current.scrollTop = 0;
       pageScrollRef.current.focus({ preventScroll: true });
+      // a direct `/project/:id/case-study` link (or the in-page "Read case
+      // study" link) should land on that section, not the top of the page —
+      // wait a tick so it doesn't fight the page's own entrance animation
+      if (caseStudy) {
+        const id = requestAnimationFrame(() => {
+          document.getElementById('gx-case-study')?.scrollIntoView({ block: 'start' });
+        });
+        return () => cancelAnimationFrame(id);
+      }
     }
-  }, [page]);
+    return undefined;
+  }, [page, caseStudy]);
 
   // keyboard
   useEffect(() => {

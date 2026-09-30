@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useLocation, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { deriveRoute } from '../../routes';
 import GlassBackground from '../../components/glass/GlassBackground';
 import ConsoleInput from '../../components/glass/ConsoleInput';
 import DesktopHint from '../../components/glass/DesktopHint';
@@ -122,6 +124,8 @@ const SECTIONS = [
 // no #home anchor for that link to reach, so activating it instead swaps in the
 // same accessible list layout touch/reduced-motion visitors already get.
 const GlassPortfolio = ({ accessibleMode = false, onAccessibleModeChange }) => {
+  const location = useLocation();
+  const params = useParams();
   const [active, setActive] = useState('home');
   const [sweepKey, setSweepKey] = useState(0);
   const [sweeping, setSweeping] = useState(false);
@@ -133,7 +137,9 @@ const GlassPortfolio = ({ accessibleMode = false, onAccessibleModeChange }) => {
   // apply the visitor's saved cube skin to the page accent on every entry path
   useEffect(() => { applyPageTheme(); }, []);
 
-  const navigate = useCallback((id) => {
+  // scrolls the fallback page to a section — named for what it actually does
+  // (not `navigate`, which would collide with react-router's own useNavigate)
+  const scrollToSection = useCallback((id) => {
     const el = document.getElementById(id);
     if (!el) return;
     scrollingTo.current = id;
@@ -144,6 +150,17 @@ const GlassPortfolio = ({ accessibleMode = false, onAccessibleModeChange }) => {
     setTimeout(() => {
       scrollingTo.current = null;
     }, 700);
+  }, []);
+
+  // a direct load of a non-home URL (a shared link, or the shell's own "Switch
+  // to List View" while already deep-linked) should land straight on that
+  // section instead of always opening on home — WorkSection reads the same
+  // route to know whether to also pop its project sheet open on top of this.
+  useEffect(() => {
+    if (useShell && !accessibleMode) return; // shell owns its own routing UI
+    const { section } = deriveRoute(location.pathname, params);
+    if (section !== 'home') scrollToSection(section);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // active-section tracking
@@ -170,9 +187,9 @@ const GlassPortfolio = ({ accessibleMode = false, onAccessibleModeChange }) => {
     if (document.body.style.overflow === 'hidden') return; // modal/menu open
     const i = SECTIONS.findIndex((s) => s.id === activeRef.current);
     const next = Math.min(Math.max(i + dir, 0), SECTIONS.length - 1);
-    if (next !== i) navigate(SECTIONS[next].id);
+    if (next !== i) scrollToSection(SECTIONS[next].id);
     setShowHint(false);
-  }, [navigate]);
+  }, [scrollToSection]);
 
   // keyboard: ← / → move between sections (↑/↓ left for native scroll)
   useEffect(() => {
@@ -246,7 +263,7 @@ const GlassPortfolio = ({ accessibleMode = false, onAccessibleModeChange }) => {
       <ConsoleInput onStep={stepSection} />
 
       <main>
-        <HomeSection onNavigate={navigate} />
+        <HomeSection onNavigate={scrollToSection} />
         <WorkSection />
         <AboutSection />
         <PlaySection />

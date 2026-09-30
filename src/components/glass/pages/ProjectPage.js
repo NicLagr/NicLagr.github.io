@@ -1,8 +1,10 @@
 import React, { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import PageShell, { pageFadeUp } from './PageShell';
 import CaseStudyBody from '../CaseStudyBody';
-import { TbArrowUpRight, TbCode, TbPresentation, TbClick } from '../icons';
+import { ROUTES } from '../../../routes';
+import { TbArrowUpRight, TbCode, TbPresentation, TbClick, TbLink } from '../icons';
 import ProjectVisual, { VisualCaption } from '../ProjectVisual';
 import sfx from '../sfx';
 import { CUBE_PALETTES } from '../cubePalettes';
@@ -35,8 +37,37 @@ const SETTINGS_FACES = [
   { id: 'theme', label: 'Theme', pos: [-0.66, 0, 1.09], w: 0.42, h: 1.5, o: 'vL' },
 ];
 
+// Copies the case study's absolute URL to the clipboard and updates the
+// address bar to match, with a brief "Copied" confirmation.
+const CopyCaseStudyLink = ({ projectId, navigate }) => {
+  const [copied, setCopied] = useState(false);
+  const handleClick = useCallback(async () => {
+    const url = `${window.location.origin}${ROUTES.caseStudy(projectId)}`;
+    navigate(ROUTES.caseStudy(projectId));
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    } catch {
+      // clipboard permission denied/unavailable — the URL is still in the
+      // address bar to copy manually, so this is a silent no-op, not an error
+    }
+  }, [projectId, navigate]);
+
+  return (
+    <button
+      type="button"
+      onClick={handleClick}
+      className="gx-btn gx-selectable !py-1.5 !px-3.5 !text-sm mb-7"
+    >
+      <TbLink size={16} /> {copied ? 'Link copied' : 'Copy link to case study'}
+    </button>
+  );
+};
+
 /** Dedicated project detail — the full-res view you reach from the Work menu. */
 const ProjectPage = ({ project }) => {
+  const navigate = useNavigate();
   const heroRef = useRef(null);
   const [cubeReady, setCubeReady] = useState(false);
   const [cubeSize, setCubeSize] = useState(300);
@@ -293,6 +324,12 @@ const ProjectPage = ({ project }) => {
           page already opened with both. */}
       {hasCaseStudy && (
         <div id="gx-case-study" className="mt-20 pt-16" style={{ borderTop: '1px solid var(--glass-edge-soft)', scrollMarginTop: 72 }}>
+          {/* Puts the case study's own shareable URL on the clipboard (and in
+              the address bar) — otherwise there's no way to grab a
+              `/case-study` link from this page at all (the mobile sheet has
+              a tab for it; this page has always shown the case study inline,
+              unconditionally). */}
+          <CopyCaseStudyLink projectId={project.id} navigate={navigate} />
           <CaseStudyBody project={project} showHero={false} showMeta={false} indexTitle={project.title} />
         </div>
       )}

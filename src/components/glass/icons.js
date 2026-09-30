@@ -25,4 +25,5 @@ export {
   TbPresentation,
   TbClick,
   Tb3DCubeSphere,
+  TbLink,
 } from 'react-icons/tb';

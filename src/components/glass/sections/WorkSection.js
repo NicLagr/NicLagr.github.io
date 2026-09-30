@@ -1,6 +1,8 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useEffect, useRef, useMemo } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { projects } from '../../../data/portfolio';
+import { ROUTES, deriveRoute } from '../../../routes';
 import { TbX, TbArrowUpRight, TbCode, TbFileText, TbArrowLeft, TbPresentation, TbClick } from '../icons';
 import SectionLabel from '../SectionLabel';
 import CaseStudyBody from '../CaseStudyBody';
@@ -52,22 +54,21 @@ const ProjectRow = ({ project, onOpen, webglReady }) => (
   </motion.button>
 );
 
-export const ProjectSheet = ({ project, onClose }) => {
-  const [showCase, setShowCase] = useState(false);
+export const ProjectSheet = ({ project, caseStudy, onClose }) => {
+  const navigate = useNavigate();
   const scrollRef = useRef(null);
+  const showCase = caseStudy;
 
   useEffect(() => {
-    const onKey = (e) => e.key === 'Escape' && (showCase ? setShowCase(false) : onClose());
+    const onKey = (e) => e.key === 'Escape' && (showCase ? navigate(ROUTES.project(project.id)) : onClose());
     window.addEventListener('keydown', onKey);
     document.body.style.overflow = 'hidden';
     return () => {
       window.removeEventListener('keydown', onKey);
       document.body.style.overflow = '';
     };
-  }, [onClose, showCase]);
+  }, [onClose, showCase, navigate, project]);
 
-  // reset to the overview whenever a different project opens
-  useEffect(() => { setShowCase(false); }, [project && project.id]);
   // jump back to the top of the sheet when toggling between views
   useEffect(() => { if (scrollRef.current) scrollRef.current.scrollTop = 0; }, [showCase]);
 
@@ -130,7 +131,7 @@ export const ProjectSheet = ({ project, onClose }) => {
             <>
               <button
                 type="button"
-                onClick={() => setShowCase(false)}
+                onClick={() => navigate(ROUTES.project(project.id))}
                 className="gx-btn !py-1.5 !px-3.5 !text-sm mb-7"
               >
                 <TbArrowLeft size={16} /> Overview
@@ -207,7 +208,7 @@ export const ProjectSheet = ({ project, onClose }) => {
               {hasCaseStudy && (
                 <button
                   type="button"
-                  onClick={() => setShowCase(true)}
+                  onClick={() => navigate(ROUTES.caseStudy(project.id))}
                   className={links.live ? 'gx-btn' : 'gx-btn gx-btn-primary'}
                 >
                   <TbFileText size={18} /> Read case study
@@ -244,8 +245,16 @@ export const ProjectSheet = ({ project, onClose }) => {
 };
 
 const WorkSection = () => {
-  const [open, setOpen] = useState(null);
+  const location = useLocation();
+  const params = useParams();
+  const navigate = useNavigate();
   const webglReady = useMemo(() => canWebGL(), []);
+
+  const { page, caseStudy } = useMemo(
+    () => deriveRoute(location.pathname, params),
+    [location.pathname, params.id, params.slug]
+  );
+  const openProject = page?.kind === 'project' ? projects.find((p) => p.id === page.id) : null;
 
   return (
     <section id="work" className="gx-anchor py-24 sm:py-32 px-5">
@@ -260,13 +269,15 @@ const WorkSection = () => {
           className="flex flex-col gap-3"
         >
           {projects.map((p) => (
-            <ProjectRow key={p.id} project={p} onOpen={setOpen} webglReady={webglReady} />
+            <ProjectRow key={p.id} project={p} onOpen={() => navigate(ROUTES.project(p.id))} webglReady={webglReady} />
           ))}
         </motion.div>
       </div>
 
       <AnimatePresence>
-        {open && <ProjectSheet project={open} onClose={() => setOpen(null)} />}
+        {openProject && (
+          <ProjectSheet project={openProject} caseStudy={caseStudy} onClose={() => navigate(ROUTES.work)} />
+        )}
       </AnimatePresence>
     </section>
   );
