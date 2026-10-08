@@ -275,7 +275,7 @@ export const projects = [
           body: [
             'A local jewelry store was running repairs and customers on paper and memory. A piece comes in and it needs a ticket, a photo, a customer attached to it, and a clear place in the queue.',
             'That is easy to lose on a busy counter. It had to be usable mid-conversation with a customer standing there, on an iPad, without slowing the conversation down.',
-            'The store is run by my family, so I could scope it with the owner directly. I designed and built all of it: the UX, the interface, the data model and the backend.',
+            'I scoped it directly with the owner, and designed and built all of it: the UX, the interface, the data model and the backend.',
           ],
           image: { src: getImagePath('/projects/jewelry-crm/paper-ticket-redacted.jpg'), maxWidth: 400, caption: 'What it replaced. Their paper ticket, redacted' },
         },
