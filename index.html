@@ -2310,12 +2310,12 @@ const CASES = {
   },
 
   portfolio: {
-    title: 'This site: prototyped in code first, planned in Figma once the direction was clear',
+    title: 'This site: a plan, a week of AI prototypes, then Figma to finish it',
     cover: { src: IMG('portfolio', 'shot-hero.jpg'), pos: '50% 38%' },
     meta: [['Role', 'Design and build'], ['Team', 'Just me, with Claude as a build partner'], ['Timeline', 'October 2026'], ['Built with', 'Claude Code, Figma, three.js, GLSL']],
     glance: [
       ['Problem', 'My old site was a concept experiment, a glass cube you had to learn before you could see any work.'],
-      ['What I did', 'Built more than a dozen working prototypes with AI in about a week, picked a direction, then planned it properly in Figma.'],
+      ['What I did', 'Set a plan, built more than a dozen working prototypes with AI in about a week, then fleshed out the winner in Figma for the build.'],
       ['Result', 'The first project shows up in one scroll, and every case study is short enough to read in a few minutes.'],
     ],
     sections: [
@@ -2323,18 +2323,22 @@ const CASES = {
         p: ['The last version was a GameCube style cube where every face was a section. I learned a lot building it, and it had character. But a recruiter had to figure out the site before seeing a single project.',
           'This time I wanted a real plan behind it, not just an idea I liked.'],
         media: [{ src: IMG('portfolio', 'hero.jpg'), cap: 'The old cube' }] },
-      { h: 'Prototypes first, Figma second',
-        p: ['Glass, scroll and a shape that morphs can’t be judged as still frames. So instead of starting in Figma, I built each direction as a working prototype with Claude, usually in an hour or two, and judged it by actually scrolling through it.',
+      { h: 'A plan before anything else',
+        p: ['I started with a planning board in Figma. Who opens this site and how long they stay, what it has to say, a small site map, and a first idea for the look: a dark ocean to kelp green aurora, with glass only on the things you touch or read.',
+          'The goal at the top of the board was to get to an interview, and everything else had to answer to that.'],
+        media: [{ src: IMG('portfolio', 'fig-board-start.jpg'), cap: 'The start of the planning board: audience, message, site map and look' }] },
+      { h: 'Then fast prototypes with Claude',
+        p: ['Glass, scroll and a shape that morphs can’t be judged as still frames. So before going any deeper in Figma, I built each direction as a working prototype with Claude, usually in an hour or two, and judged it by actually scrolling through it.',
           'That made trying an idea nearly free. Light theme versus dark, a cube versus a liquid drop, a ring of covers versus a plain grid. Each one got built, looked at and kept or cut the same day.'],
         media: [{ src: IMG('portfolio', 'v-unfold.jpg'), cap: 'An early direction, a cube that unfolds into the work grid' }, { src: IMG('portfolio', 'v-ring1.jpg'), cap: 'The first ring of covers, before it moved into WebGL' }] },
       { h: 'Cut fast, and write down why',
         p: ['The cube that unfolded felt mechanical. One swipe per project felt slow. A preview modal before each case study was an extra click that repeated the card. All three were built, tried and cut.',
           'I kept a decisions log with every cut and the reason for it, so the next prototype didn’t repeat the last mistake.'],
         media: [{ carousel: [['wing', 'Weather & Flight, a wing in a wind tunnel'], ['signpost', 'SIGNPOST, arms pointing different ways'], ['ripples', 'Mission Control, ripples that read as live'], ['ring', 'Jewelry CRM, a ring with a pear stone'], ['nest', 'Nurture Nest, a nest holding an egg']].map(([f, cap]) => ({ src: IMG('portfolio', `shape-${f}.jpg`), cap })) }] },
-      { h: 'Then the plan, in Figma',
-        p: ['Once the direction stopped moving, I moved into Figma to plan it properly: who the site is for, a site map, the scroll story beat by beat, wireframes for every page, then mid to high fidelity mocks.',
-          'Figma came last on purpose. By then it was documenting decisions that had already been tested, not guessing at them.'],
-        media: [{ src: IMG('portfolio', 'fig-board.jpg'), cap: 'The planning board: audience, site map, the scroll story, the shape for each project and a log of every cut' },
+      { h: 'Back to Figma to finish it',
+        p: ['Once the direction stopped moving, I went back to Figma and fleshed it out for development: the scroll story beat by beat, a shape for each project, wireframes for every page, then mid to high fidelity mocks to build from.',
+          'By then the board was recording decisions that had already been tested. The log of every cut and why lives there too.'],
+        media: [{ src: IMG('portfolio', 'fig-board.jpg'), cap: 'The full board by the end, with the scroll story, a shape per project and the log of every cut' },
           { pair: [{ src: IMG('portfolio', 'fig-wf-ring.jpg'), label: 'Wireframe' }, { src: IMG('portfolio', 'fig-mock-ring.jpg'), label: 'Mock' }], cap: 'The project ring, wireframe to mock' }],
         links: [['Planning board in Figma', 'https://www.figma.com/design/brDXR4UphlabYpkDX4Vkli/Portfolio?node-id=1-2']] },
       { h: 'One drop, a shape per project',
@@ -2343,7 +2347,7 @@ const CASES = {
     ],
     build: { h: 'How it’s built',
       p: ['The shapes are math, not 3D models, which is why a drop can turn into a ring with a hole in it. That also ruled out Spline, which can only blend between meshes. Phones and reduced motion get a simpler version with the same content.'] },
-    learned: 'Prototyping in code first meant every decision in the Figma file had already been tried. AI made the trying cheap, and the decisions log made sure each try taught me something.'
+    learned: 'Putting fast prototypes between the plan and the final Figma work meant every screen in the mocks had already been tried. AI made the trying cheap, and the decisions log made sure each try taught me something.'
   },
 };
 
